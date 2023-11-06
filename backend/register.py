@@ -1,14 +1,15 @@
 from flask import Flask, render_template, request, flash, session
-from flask_sqlalchemy import  SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 import pymysql
 
 app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:YourPassword@localhost:3306/finalProject'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# db = SQLAlchemy(app)
-app.secret_key='kdjklfjkd87384hjdhjh'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://xjc:70xc1227@alas.xerotech.cloud:7492/project'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+app.secret_key = 'kdjklfjkd87384hjdhjh'
 
-@app.route('/register', methods = ['GET','POST'])
+
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     if (request.method == "GET"):
         return render_template("register.html")
@@ -26,7 +27,8 @@ def register():
 
         return render_template("register.html")
 
-@app.route('/login', methods = ['GET','POST'])
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if (request.method == "GET"):
         return render_template("login.html")
