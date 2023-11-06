@@ -1,10 +1,10 @@
-## University of Pittsburgh
-
-## School of Computing and Information
-
-## Department of Informatics and Networked Systems
 
 # INFSCI 2710: Database Management
+**University of Pittsburgh**
+
+**School of Computing and Information**
+
+**Department of Informatics and Networked Systems**
 
 ```
 PROJECT: Database System for E-Commerce
