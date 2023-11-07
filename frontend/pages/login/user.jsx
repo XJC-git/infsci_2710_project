@@ -10,7 +10,7 @@ export default function User(){
         const username = document.querySelector("#username").value;
         const password = document.querySelector("#password").value;
         axios_instance.post('/login',{
-            username:username,
+            user_id:username,
             password:password
         }).then((res) => {
             alert(res.data.msg)
