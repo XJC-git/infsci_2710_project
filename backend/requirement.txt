@@ -1,3 +1,5 @@
-flask
-flask_sqlalchemy
-mysql-python
+# 后端代码调用前待安装环境
+flask version: 2.3.3
+flask_sqlalchemy version: 2.5.1
+mysql-connector-python version: 8.2.0
+SQLALchemy version: 1.4.32
