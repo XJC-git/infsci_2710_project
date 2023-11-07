@@ -1,47 +1,71 @@
-from flask import Flask, render_template, request, flash, session
-from flask_sqlalchemy import SQLAlchemy
+# 文档注释：
+# 1. 在运行该文档前，请先运行initDatabase.py以为数据库创建数据表
+# 2. 在运行该文档前，请在mySQL中创建一个名为finalProject的database
+# 3. 在运行该文档前，请将'mysql://root:YourPassword@localhost:3306/finalProject'中的‘YourPassword’改为您mySQL数据库的登录密码
+
+
+from flask import Flask, render_template, request, flash, make_response
+from flask_sqlalchemy import  SQLAlchemy
 import pymysql
+import initDatabase
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:YourPassword@localhost:3306/finalProject'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-app.secret_key = 'kdjklfjkd87384hjdhjh'
+app.secret_key='kdjklfjkd87384hjdhjh'
 
-
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods = ['GET','POST'])
 def register():
     if (request.method == "GET"):
         return render_template("register.html")
     else:
+        # 获取表格
+        User = initDatabase.User
+
         user_id = request.form.get("user_id")
         password = request.form.get("password")
         password_1 = request.form.get("password_1")
-        session['1'] = user_id
-        session['2'] = password
-        # 未连接数据库版本测试
-        if password_1 == password:
-            flash('Account created successfully')
+
+        # 查询
+        existed_user = User.query.get(user_id)
+
+        # 连接数据库版本测试
+        if existed_user:
+            flash('User id existed!')
+        elif password_1 == password:
+            flash('Account created successfully.')
+            # 存入数据
+            user = User(user_id=user_id, password=password)
+            db.session.add(user)
+            db.session.commit()
         elif password != password_1:
-            flash('The passwords entered twice are inconsistent')
+            flash('The passwords entered twice are inconsistent.')
+
 
         return render_template("register.html")
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods = ['GET','POST'])
 def login():
     if (request.method == "GET"):
         return render_template("login.html")
     else:
+        # 获取表格
+        User = initDatabase.User
         user_id_input = request.form.get("user_id")
         password_input = request.form.get("password")
 
-        if user_id_input == session['1'] and password_input == session['2']:
-            flash('Account login successfully')
-        elif password_input != session['2']:
-            flash('Password incorrect')
-        else:
+        # 获取数据库中数据
+        user_id = User.query.get(user_id_input).user_id
+        password = User.query.get(user_id_input).password
+        if not user_id:
             flash("Account doesn't exit")
+        elif password_input == password:
+            flash('Account login successfully')
+        else:
+            flash('Password incorrect')
+
         return render_template("login.html")
 
 
