@@ -9,10 +9,10 @@ export default function User(){
     function handleLogin(){
         const username = document.querySelector("#username").value;
         const password = document.querySelector("#password").value;
-        axios_instance.post('/login',{
+        axios_instance.post('/login',null,{params:{
             user_id:username,
             password:password
-        }).then((res) => {
+        }}).then((res) => {
             alert(res.data.msg)
         });
     }
