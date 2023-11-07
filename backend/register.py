@@ -4,19 +4,17 @@
 # 3. 在运行该文档前，请将'mysql://root:YourPassword@localhost:3306/finalProject'中的‘YourPassword’改为您mySQL数据库的登录密码
 
 
-from flask import Flask, render_template, request, flash, make_response
-from flask_sqlalchemy import SQLAlchemy
-import pymysql
+from flask import Flask, render_template, request, flash
+from flask_sqlalchemy import  SQLAlchemy
 import initDatabase
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:YourPassword@localhost:3306/finalProject'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:tgf20001202@localhost:3306/finalProject'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-app.secret_key = 'kdjklfjkd87384hjdhjh'
+app.secret_key='kdjklfjkd87384hjdhjh'
 
-
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods = ['GET','POST'])
 def register():
     if (request.method == "GET"):
         return render_template("register.html")
@@ -43,10 +41,11 @@ def register():
         elif password != password_1:
             flash('The passwords entered twice are inconsistent.')
 
+
         return render_template("register.html")
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods = ['GET','POST'])
 def login():
     if (request.method == "GET"):
         return render_template("login.html")
@@ -57,14 +56,16 @@ def login():
         password_input = request.form.get("password")
 
         # 获取数据库中数据
-        user_id = User.query.get(user_id_input).user_id
-        password = User.query.get(user_id_input).password
+        user_id = User.query.get(user_id_input)
+
         if not user_id:
             flash("Account doesn't exit")
-        elif password_input == password:
-            flash('Account login successfully')
         else:
-            flash('Password incorrect')
+            password = User.query.get(user_id_input).password
+            if password_input == password:
+                flash('Account login successfully')
+            else:
+                flash('Password incorrect')
 
         return render_template("login.html")
 
