@@ -1,15 +1,15 @@
 # 文档注释：
 # 1. 在运行该文档前，请先运行initDatabase.py以为数据库创建数据表
-# 2. 在运行该文档前，请在mySQL中创建一个名为finalProject的database
-# 3. 在运行该文档前，请将'mysql://root:YourPassword@localhost:3306/finalProject'中的‘YourPassword’改为您mySQL数据库的登录密码
+# 2. 在运行该文档前，请将在db_Info文档中填写您关于database的相关信息
 
 
 from flask import Flask, render_template, request, flash
 from flask_sqlalchemy import  SQLAlchemy
 import initDatabase
+import dbInfo
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:tgf20001202@localhost:3306/finalProject'
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://" + dbInfo.user_name + ":" + dbInfo.password + "@" + dbInfo.host + "/" + dbInfo.db_name
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 app.secret_key='kdjklfjkd87384hjdhjh'
