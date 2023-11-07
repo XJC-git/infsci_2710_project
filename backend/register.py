@@ -56,15 +56,17 @@ def login():
         user_id_input = request.form.get("user_id")
         password_input = request.form.get("password")
 
-        # 获取数据库中数据
-        user_id = User.query.get(user_id_input).user_id
-        password = User.query.get(user_id_input).password
+       # 获取数据库中数据
+        user_id = User.query.get(user_id_input)
+
         if not user_id:
             flash("Account doesn't exit")
-        elif password_input == password:
-            flash('Account login successfully')
         else:
-            flash('Password incorrect')
+            password = User.query.get(user_id_input).password
+            if password_input == password:
+                flash('Account login successfully')
+            else:
+                flash('Password incorrect')
 
         return render_template("login.html")
 
