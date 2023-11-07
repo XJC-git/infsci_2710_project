@@ -1,5 +1,6 @@
 #提交时忽略配置文件
 backend/dbInfo.py
+frontend/.idea
 
 # Default ignored files
 /shelf/
