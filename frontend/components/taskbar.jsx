@@ -44,7 +44,7 @@ export default function TaskBar(){
                         </a>
                     </div>
                 </div>
-                    <div className="pt-4"><a href="/auth/user" className="block rounded-lg bg-gray-100 p-4 text-xl font-bold text-gray-600 hover:bg-gray-200 hover:text-gray-800">
+                    <div className="pt-4"><a href="/login/user" className="block rounded-lg bg-gray-100 p-4 text-xl font-bold text-gray-600 hover:bg-gray-200 hover:text-gray-800">
                         Login
                     </a>
                     </div>
@@ -62,7 +62,10 @@ export default function TaskBar(){
 
                 </div>
                 <div className="hidden md:flex md:flex-1 md:justify-end gap-x-2">
-                    <a  className="rounded-lg px-4 py-2 ring-1 ring-gray-600 hover:text-gray-800 hover:ring-gray-800">
+                    <a  className="rounded-lg px-4 py-2 ring-1 ring-gray-600
+                    hover:text-gray-800
+                    hover:ring-gray-800
+                    hover:ring-2">
                         <div className="flex flex-1 items-center justify-between md:gap-x-2">
                             <svg width="20" height="20" className="flex" viewBox="0 0 20 20">
                                 <path d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z" stroke="currentColor" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
@@ -71,7 +74,10 @@ export default function TaskBar(){
                             <span className="flex text-lg text-gray-600 whitespace-nowrap">Search products, stores....</span>
                         </div>
                     </a>
-                    <a href="/login/user" className="whitespace-nowrap rounded-lg px-4 py-2 text-lg font-bold text-gray-600 ring-1 ring-gray-600 hover:text-gray-800 hover:ring-gray-800">
+                    <a href="/login/user" className="whitespace-nowrap rounded-lg px-4 py-2 text-lg font-bold text-gray-600 ring-1 ring-gray-600
+                    hover:text-gray-800
+                    hover:ring-gray-800
+                    hover:ring-2">
                         Log in
                     </a>
                 </div>
