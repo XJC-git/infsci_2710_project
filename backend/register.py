@@ -5,7 +5,7 @@
 
 
 from flask import Flask, render_template, request, flash, make_response
-from flask_sqlalchemy import  SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 import pymysql
 import initDatabase
 
@@ -13,9 +13,10 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:YourPassword@localhost:3306/finalProject'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-app.secret_key='kdjklfjkd87384hjdhjh'
+app.secret_key = 'kdjklfjkd87384hjdhjh'
 
-@app.route('/register', methods = ['GET','POST'])
+
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     if (request.method == "GET"):
         return render_template("register.html")
@@ -42,11 +43,10 @@ def register():
         elif password != password_1:
             flash('The passwords entered twice are inconsistent.')
 
-
         return render_template("register.html")
 
 
-@app.route('/login', methods = ['GET','POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if (request.method == "GET"):
         return render_template("login.html")
