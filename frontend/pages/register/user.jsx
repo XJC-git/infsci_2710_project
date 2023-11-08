@@ -10,9 +10,11 @@ export default function User(){
     function handleRegister(){
         const username = document.querySelector("#username").value;
         const password = document.querySelector("#password").value;
-        axios_instance.post('/register',{
-            user_id:username,
-            password:password
+        axios_instance.post('/register',null,{
+            params:{
+                user_id:username,
+                password:password
+            }
         }).then((res) => {
             alert(res.data.msg)
         });
