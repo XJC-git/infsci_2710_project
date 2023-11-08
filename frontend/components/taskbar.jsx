@@ -43,7 +43,7 @@ export default function TaskBar(){
                             </a>
                         </div>
                         <div>
-                            <a href="/docs/about" className="block rounded-lg bg-gray-100 p-4 text-xl font-bold hover:bg-gray-200 hover:text-gray-600 text-gray-400">
+                            <a onClick={()=>{setMenu(false);setSearchPopup(true)}} className="block rounded-lg bg-gray-100 p-4 text-xl font-bold hover:bg-gray-200 hover:text-gray-600 text-gray-400">
                                 Search
                             </a>
                         </div>
@@ -120,7 +120,9 @@ export default function TaskBar(){
                         Recommend
                         <div className="flex gap-x-2 mt-2">
                             {rec.map((item=>(
-                                <div className="rounded-xl bg-blue-500/20 text-sm px-2">{item}</div>
+                                <a href={"/search?keyword="+item.valueOf()} className="rounded-xl bg-blue-500/20 text-sm px-2 hover:bg-blue-500/60">
+                                    {item}
+                                </a>
                             )))}
                         </div>
 
