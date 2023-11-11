@@ -15,8 +15,7 @@ class Users(db.Model):
     # 定义表名
     __tablename__ = 'user'
     # 定义表字段
-    user_id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(48))
+    user_id = db.Column(db.String(48), primary_key=True)
     password = db.Column(db.String(48))
     user_type = db.Column(db.String(48))
 
@@ -25,7 +24,7 @@ class Customers(db.Model):
     # 定义表名
     __tablename__ = 'customers'
     # 定义表字段
-    customer_id = db.Column(db.Integer, db.ForeignKey("user.user_id"), primary_key=True)
+    customer_id = db.Column(db.String(48), db.ForeignKey("user.user_id"), primary_key=True)
     address = db.Column(db.String(48))
     state = db.Column(db.String(48))
     city = db.Column(db.String(48))
@@ -58,7 +57,7 @@ class Salespersons(db.Model):
     # 定义表名
     __tablename__ = 'salespersons'
     # 定义表字段
-    salesperson_id = db.Column(db.Integer, db.ForeignKey("user.user_id"), primary_key=True)
+    salesperson_id = db.Column(db.String(48), db.ForeignKey("user.user_id"), primary_key=True)
     name = db.Column(db.String(48))
     email = db.Column(db.String(48))
     job_title = db.Column(db.String(48))
@@ -87,8 +86,8 @@ class Transactions(db.Model):
     # 定义表字段
     transaction_id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date)
-    salesperson_id = db.Column(db.Integer, db.ForeignKey("salespersons.salesperson_id"))
-    customer_id = db.Column(db.Integer, db.ForeignKey("customers.customer_id"))
+    salesperson_id = db.Column(db.String(48), db.ForeignKey("salespersons.salesperson_id"))
+    customer_id = db.Column(db.String(48), db.ForeignKey("customers.customer_id"))
 
 
 class Sub_Transactions(db.Model):
@@ -106,7 +105,7 @@ class Home_Customers_Details(db.Model):
     # 定义表名
     __tablename__ = 'home_customers'
     # 定义表字段
-    customer_id = db.Column(db.Integer, db.ForeignKey("customers.customer_id"), primary_key=True)
+    customer_id = db.Column(db.String(48), db.ForeignKey("customers.customer_id"), primary_key=True)
     marriage_status = db.Column(db.Boolean)
     gender = db.Column(db.String(24))
     age = db.Column(db.Integer)
@@ -116,7 +115,7 @@ class Business_Customer_Details(db.Model):
     # 定义表名
     __tablename__ = 'business_customers'
     # 定义表字段
-    customer_id = db.Column(db.Integer, db.ForeignKey("customers.customer_id"), primary_key=True)
+    customer_id = db.Column(db.String(48), db.ForeignKey("customers.customer_id"), primary_key=True)
     company_name = db.Column(db.String(48))
     business_category = db.Column(db.String(48))
     company_income = db.Column(db.Float)
