@@ -48,7 +48,7 @@ def register():
         #return render_template("register.html")
 
 
-@app.route('/register/customer<customer_id>', methods = ['GET','POST'])
+@app.route('/register/customer/<customer_id>', methods = ['GET','POST'])
 def customer_register(customer_id):
     if (request.method == "POST"):
         Customer = initDatabase.Customers
@@ -71,7 +71,7 @@ def customer_register(customer_id):
         return 200
 
 
-@app.route('register/salesperson<salesperson_id>', methods=["POST"])
+@app.route('register/salesperson/<salesperson_id>', methods=["POST"])
 def salesperson_register(salesperson_id):
     if (request.method == "POST"):
         Salesperson = initDatabase.Salespersons
