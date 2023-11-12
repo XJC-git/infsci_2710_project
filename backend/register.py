@@ -71,7 +71,7 @@ def customer_register(customer_id):
         return 200
 
 
-@app.route('register/salesperson/<salesperson_id>', methods=["POST"])
+@app.route('/register/salesperson/<salesperson_id>', methods=["POST"])
 def salesperson_register(salesperson_id):
     if (request.method == "POST"):
         Salesperson = initDatabase.Salespersons
@@ -111,7 +111,7 @@ def salesperson_register(salesperson_id):
         return 200
 
 
-@app.route('/register/store', methos=["POST"])
+@app.route('/register/store', methods=["POST"])
 def store_register():
     if (request.method == "POST"):
         Store = initDatabase.Store
@@ -152,7 +152,7 @@ def store_register():
         return 200
 
 
-@app.route('register/region', methods=["POST"])
+@app.route('/register/region', methods=["POST"])
 def register_region():
     if (request.method == "POST"):
         Region = initDatabase.Region
