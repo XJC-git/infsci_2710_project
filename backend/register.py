@@ -109,7 +109,7 @@ def salesperson_register(salesperson_id):
         return 200
 
 
-@app.route('/register/store', methos=["POST"])
+@app.route('/register/store', methods=["POST"])
 def store_register():
     if request.method == "POST":
         Store = initDatabase.Store
