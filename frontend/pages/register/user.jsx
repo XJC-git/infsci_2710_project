@@ -2,27 +2,43 @@ import {useEffect, useState} from "react";
 import axios_instance from "app/axios";
 import {useRouter} from "next/router";
 import { Transition } from '@headlessui/react';
+import Notification from "../../components/notification";
 
 export default function User(){
     const router = useRouter();
     const [show,setShow] = useState(false)
     const [confirmShow,setConfirmShow] = useState(false)
+    const [showNotification,setShowNotification] = useState(false)
+    const [typeNotification,setTypeNotification] = useState('success')
+    const [contextNotification,setContextNotification] = useState('EMPTY MSG')
     function handleRegister(){
         const username = document.querySelector("#username").value;
         const password = document.querySelector("#password").value;
+        const confirmPassword = document.querySelector("#confirmPassword").value;
         axios_instance.post('/register',null,{
             params:{
                 user_id:username,
-                password:password
+                password:password,
+                password_1:confirmPassword
             }
         }).then((res) => {
+            setShowNotification(true)
             alert(res.data.msg)
+        }).catch((error)=>{
+            console.table(error.response)
+            setTypeNotification('fail')
+            setContextNotification(error.message)
+            setShowNotification(true)
+            setTimeout(function() {
+                setShowNotification(false)
+            }, 2000);
         });
     }
 
     const [isShowing, setIsShowing] = useState(true)
     return(
         <>
+            <Notification show={showNotification} context={contextNotification} type={typeNotification}></Notification>
             <div className="flex h-full min-h-screen flex-col items-center justify-center bg-gray-100">
                 <Transition
                     as='div'
