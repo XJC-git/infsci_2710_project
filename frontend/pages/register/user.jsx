@@ -25,13 +25,23 @@ export default function User(){
             setShowNotification(true)
             alert(res.data.msg)
         }).catch((error)=>{
-            console.table(error.response)
-            setTypeNotification('fail')
-            setContextNotification(error.message)
-            setShowNotification(true)
-            setTimeout(function() {
-                setShowNotification(false)
-            }, 2000);
+            if(error.response){
+                setTypeNotification('fail')
+                setContextNotification(error.response.data)
+                setShowNotification(true)
+                setTimeout(function() {
+                    setShowNotification(false)
+                }, 2000);
+            }
+            else{
+                setTypeNotification('fail')
+                setContextNotification(error.message)
+                setShowNotification(true)
+                setTimeout(function() {
+                    setShowNotification(false)
+                }, 2000);
+            }
+
         });
     }
 
