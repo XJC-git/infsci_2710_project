@@ -20,7 +20,7 @@ def register():
         # 获取表格
         User = initDatabase.Users
 
-        user_id = request.args.get("username")
+        user_id = request.args.get("user_id")
         password = request.args.get("password")
         password_1 = request.args.get("password_1")
 
@@ -59,10 +59,20 @@ def customer_register(customer_id):
         Customer = initDatabase.Customers
 
         address = request.args.get("address")
+        if len(address) == 0:
+            return "Please input the address!",405
         state = request.args.get("state")
+        if len(state) == 0:
+            return "Please input the state",405
         city = request.args.get("city")
+        if len(city) == 0:
+            return "Please input the city",405
         zip_code = request.args.get("zip_code")
+        if zip_code == 0:
+            return "Please input the zip code",405
         kind = request.args.get("kind")
+        if len(kind) == 0:
+            return "Please input the kind",405
         customer_id = customer_id
         flash("Account created successfully.")
         customer = Customer(customer_id=customer_id,
@@ -73,7 +83,7 @@ def customer_register(customer_id):
                             kind=kind)
         db.session.add(customer)
         db.session.commit()
-        return 200
+        return "Account created successfully.",200
 
 
 @app.route('/register/salesperson/<salesperson_id>', methods=["POST"])
@@ -83,21 +93,39 @@ def salesperson_register(salesperson_id):
         Store = initDatabase.Store
 
         name = request.args.get("name")
+        if len(name) == 0:
+            return "Please input the name",406
         email = request.args.get("email")
+        if len(email) == 0:
+            return "Please input the email",406
         job_title = request.args.get("job_title")
+        if len(job_title) == 0:
+            return "Please input the job title",406
         store_assigned = request.args.get("store_assigned")
+        if store_assigned == 0:
+            return "Please input the store assigned",406
         salary = request.args.get("salary")
+        if salary == 0:
+            return "Please input the salary",406
         state = request.args.get("state")
+        if len(state) == 0:
+            return "Please input the state",406
         city = request.args.get("city")
+        if len(city) == 0:
+            return "Please input the city",406
         address = request.args.get("address")
+        if len(address) == 0:
+            return "Please input the address",406
         zip_code = request.args.get("zip_code")
+        if zip_code == 0:
+            return "Please input the zip code",406
 
         # 判断store是否已经存在
         store_exist = Store.query.get(store_assigned)
 
         if not store_exist:
             flash("Store doesn't exist")
-            return 405
+            return "Store doesn't exist",405
 
         salesperson = Salesperson(salesperson_id=salesperson_id,
                                   name=name,
@@ -113,7 +141,7 @@ def salesperson_register(salesperson_id):
         db.session.add(salesperson)
         db.session.commit()
         flash("salesperson create successfully")
-        return 200
+        return "salesperson create successfully",200
 
 
 @app.route('/register/store', methods=["POST"])
@@ -123,26 +151,40 @@ def store_register():
         Region = initDatabase.Region
 
         store_id = request.args.get("store_id")
+        if store_id == 0:
+            return "Please input store id",407
         address = request.args.get("address")
+        if len(address) == 0:
+            return "Please input the address",407
         state = request.args.get("state")
+        if len(state) == 0:
+            return "Please input the state",407
         city = request.args.get("city")
+        if len(city) == 0:
+            return "Please input the city",407
         manager = request.args.get("manager")
+        if len(manager) == 0:
+            return "Please input the manager",407
         number_of_salesperson = request.args.get("salesperson")
+        if number_of_salesperson == 0:
+            return "Please input the number of salesperson",407
         region = request.args.get("region")
+        if region == 0:
+            return "Please input the region",407
 
         # 判断region是否已经存在
         region_exist = Region.query.get(region)
 
         if not region_exist:
             flash("region doesn't exist")
-            return 405
+            return "region doesn't exist",405
 
         # 判断store_id是否重复
         store_repeated = Store.query.get(store_id)
 
         if store_repeated:
             flash("store id existed")
-            return 406
+            return "store id existed",406
 
         store = Store(store_id=store_id,
                       address=address,
@@ -154,7 +196,7 @@ def store_register():
         db.session.add(store)
         db.session.commit()
         flash("store create successfully")
-        return 200
+        return "store create successfully",200
 
 
 @app.route('/register/region', methods=["POST"])
@@ -163,15 +205,21 @@ def register_region():
         Region = initDatabase.Region
 
         region_id = request.args.get("region_id")
+        if region_id == 0:
+            return "Please input region id",406
         region_name = request.args.get("region_name")
+        if len(region_name) == 0:
+            return "Please input region name",406
         region_manager = request.args.get("region_manager")
+        if len(region_manager) == 0:
+            return "Please input region manager",406
 
         # 判断region_id是否重复
         region_repeated = Region.query.get(region_id)
 
         if region_repeated:
             flash("region id existed")
-            return 405
+            return "region id existed",405
 
         region = Region(region_id=region_id,
                         region_name=region_name,
@@ -179,14 +227,12 @@ def register_region():
         db.session.add(region)
         db.session.commit()
         flash("region create successfully")
-        return 200
+        return "region create successfully",200
 
 
 @app.route('/login', methods=['GET','POST'])
 def login():
-    if request.method == "GET":
-        return render_template("login.html")
-    else:
+    if request.method == "POST":
         # 获取表格
         User = initDatabase.Users
         user_id_input = request.args.get("user_id")
@@ -197,17 +243,15 @@ def login():
 
         if not user_id:
             flash("Account doesn't exist")
-            return 405
+            return "Account doesn't exist",405
         else:
             password = User.query.get(user_id_input).password
             if password_input == password:
                 flash('Account login successfully')
-                return 200
+                return "Account login successfully",200
             else:
                 flash('Password incorrect')
-                return 406
-
-        #return render_template("login.html")
+                return "Password incorrect",406
 
 
 if __name__ == '__main__':
