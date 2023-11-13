@@ -20,12 +20,19 @@ def register():
         # 获取表格
         User = initDatabase.Users
 
-        user_id = request.args.get("user_id")
+        user_id = request.args.get("username")
         password = request.args.get("password")
         password_1 = request.args.get("password_1")
 
         # 查询
         existed_user = User.query.get(user_id)
+
+        if len(user_id) == 0:
+            flash('Please input the username')
+            return make_response(407)
+        if len(password_1) == 0:
+            flash('Please input the password')
+            return make_response(408)
 
         # 连接数据库版本测试
         if existed_user:
@@ -41,7 +48,6 @@ def register():
         elif password != password_1:
             flash('The passwords entered twice are inconsistent.')
             return make_response(405)
-
 
         #return render_template("register.html")
 
