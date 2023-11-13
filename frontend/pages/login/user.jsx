@@ -2,10 +2,14 @@ import {useState} from "react";
 import axios_instance from "app/axios";
 import {useRouter} from "next/router";
 import {Transition} from "@headlessui/react";
+import Notification from "../../components/notification";
 
 export default function User(){
     const router = useRouter();
     const [show,setShow] = useState(false)
+    const [showNotification,setShowNotification] = useState(false)
+    const [typeNotification,setTypeNotification] = useState('success')
+    const [contextNotification,setContextNotification] = useState('EMPTY MSG')
 
     function handleLogin(){
         const username = document.querySelector("#username").value;
@@ -14,12 +18,36 @@ export default function User(){
             'user_id':username,
             'password':password
         }}).then((res) => {
-            alert(res.data.msg)
+            setTypeNotification('success')
+            setContextNotification(res.data)
+            setShowNotification(true)
+            setTimeout(function() {
+                setShowNotification(false)
+            }, 2000);
+        }).catch((error)=>{
+            if(error.response){
+                setTypeNotification('fail')
+                setContextNotification(error.response.data)
+                setShowNotification(true)
+                setTimeout(function() {
+                    setShowNotification(false)
+                }, 2000);
+            }
+            else{
+                setTypeNotification('fail')
+                setContextNotification(error.message)
+                setShowNotification(true)
+                setTimeout(function() {
+                    setShowNotification(false)
+                }, 2000);
+            }
+
         });
     }
     const [isShowing, setIsShowing] = useState(true)
     return(
         <>
+            <Notification show={showNotification} context={contextNotification} type={typeNotification}></Notification>
             {/*<div className="fixed h-screen w-screen -z-10 overflow-hidden blur-sm">*/}
             {/*    <img className="fixed h-screen w-screen" src="https://www.pitt.edu/sites/default/files/styles/tier_one_hero/public/2021-07/mission-t1-cl-top-aerial.jpg?h=2c66ef4f&itok=YlGwAwOr"/>*/}
             {/*</div>*/}
