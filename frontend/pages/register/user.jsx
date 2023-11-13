@@ -22,8 +22,12 @@ export default function User(){
                 password_1:confirmPassword
             }
         }).then((res) => {
+            setTypeNotification('success')
+            setContextNotification(res.data)
             setShowNotification(true)
-            alert(res.data.msg)
+            setTimeout(function() {
+                setShowNotification(false)
+            }, 2000);
         }).catch((error)=>{
             if(error.response){
                 setTypeNotification('fail')
