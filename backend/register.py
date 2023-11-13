@@ -29,25 +29,26 @@ def register():
 
         if len(user_id) == 0:
             flash('Please input the username')
-            return make_response(407)
+            return "Please input the username", 407
         if len(password_1) == 0:
             flash('Please input the password')
-            return make_response(408)
+            return "Please input the password", 408
 
         # 连接数据库版本测试
         if existed_user:
             flash('User id existed!')
-            return make_response(406)
+            return "User id existed!", 406
         elif password_1 == password:
             flash('Account created successfully.')
             # 存入数据
             user = User(user_id=user_id, password=password)
             db.session.add(user)
             db.session.commit()
-            return 'success',200
+            return "Account created successfully.", 200
         elif password != password_1:
             flash('The passwords entered twice are inconsistent.')
-            return make_response(405)
+            return "The passwords entered twice are inconsistent.", 405
+
 
         #return render_template("register.html")
 
