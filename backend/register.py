@@ -3,7 +3,7 @@
 # 2. 在运行该文档前，请将在db_Info文档中填写您关于database的相关信息
 
 
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash, make_response
 from flask_sqlalchemy import  SQLAlchemy
 import initDatabase
 import dbInfo
@@ -14,11 +14,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 app.secret_key='kdjklfjkd87384hjdhjh'
 
-@app.route('/register', methods = ['GET','POST'])
+@app.route('/register', methods=['GET','POST'])
 def register():
-    if (request.method == "GET"):
-        return render_template("register.html")
-    else:
+    if request.method == "POST":
         # 获取表格
         User = initDatabase.Users
 
@@ -32,25 +30,25 @@ def register():
         # 连接数据库版本测试
         if existed_user:
             flash('User id existed!')
-            return 406
+            return make_response(406)
         elif password_1 == password:
             flash('Account created successfully.')
             # 存入数据
             user = User(user_id=user_id, password=password)
             db.session.add(user)
             db.session.commit()
-            return 200
+            return make_response(200)
         elif password != password_1:
             flash('The passwords entered twice are inconsistent.')
-            return 405
+            return make_response(405)
 
 
         #return render_template("register.html")
 
 
-@app.route('/register/customer/<customer_id>', methods = ['GET','POST'])
+@app.route('/register/customer/<customer_id>', methods=['GET','POST'])
 def customer_register(customer_id):
-    if (request.method == "POST"):
+    if request.method == "POST":
         Customer = initDatabase.Customers
 
         address = request.args.get("address")
@@ -73,7 +71,7 @@ def customer_register(customer_id):
 
 @app.route('/register/salesperson/<salesperson_id>', methods=["POST"])
 def salesperson_register(salesperson_id):
-    if (request.method == "POST"):
+    if request.method == "POST":
         Salesperson = initDatabase.Salespersons
         Store = initDatabase.Store
 
@@ -111,9 +109,9 @@ def salesperson_register(salesperson_id):
         return 200
 
 
-@app.route('/register/store', methods=["POST"])
+@app.route('/register/store', methos=["POST"])
 def store_register():
-    if (request.method == "POST"):
+    if request.method == "POST":
         Store = initDatabase.Store
         Region = initDatabase.Region
 
@@ -154,7 +152,7 @@ def store_register():
 
 @app.route('/register/region', methods=["POST"])
 def register_region():
-    if (request.method == "POST"):
+    if request.method == "POST":
         Region = initDatabase.Region
 
         region_id = request.args.get("region_id")
@@ -177,9 +175,9 @@ def register_region():
         return 200
 
 
-@app.route('/login', methods = ['GET','POST'])
+@app.route('/login', methods=['GET','POST'])
 def login():
-    if (request.method == "GET"):
+    if request.method == "GET":
         return render_template("login.html")
     else:
         # 获取表格
