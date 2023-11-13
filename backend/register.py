@@ -44,7 +44,7 @@ def register():
             user = User(user_id=user_id, password=password)
             db.session.add(user)
             db.session.commit()
-            return make_response(200)
+            return 'success',200
         elif password != password_1:
             flash('The passwords entered twice are inconsistent.')
             return make_response(405)
