@@ -14,6 +14,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 app.secret_key='kdjklfjkd87384hjdhjh'
 
+# 防止数据库连接超时
+SQLALCHEMY_POOL_SIZE = 20
+SQLALCHEMY_POOL_TIMEOUT = 300
+
 @app.route('/register', methods=['GET','POST'])
 def register():
     if request.method == "POST":
@@ -37,7 +41,7 @@ def register():
         # 连接数据库版本测试
         if existed_user:
             flash('User id existed!')
-            return "User id existed!", 406
+            return "User id existed!", 409
         elif password_1 == password:
             flash('Account created successfully.')
             # 存入数据
@@ -94,31 +98,31 @@ def salesperson_register(salesperson_id):
 
         name = request.args.get("name")
         if len(name) == 0:
-            return "Please input the name",406
+            return "Please input the name",407
         email = request.args.get("email")
         if len(email) == 0:
-            return "Please input the email",406
+            return "Please input the email",407
         job_title = request.args.get("job_title")
         if len(job_title) == 0:
-            return "Please input the job title",406
+            return "Please input the job title",407
         store_assigned = request.args.get("store_assigned")
         if store_assigned == 0:
-            return "Please input the store assigned",406
+            return "Please input the store assigned",407
         salary = request.args.get("salary")
         if salary == 0:
-            return "Please input the salary",406
+            return "Please input the salary",407
         state = request.args.get("state")
         if len(state) == 0:
-            return "Please input the state",406
+            return "Please input the state",407
         city = request.args.get("city")
         if len(city) == 0:
-            return "Please input the city",406
+            return "Please input the city",407
         address = request.args.get("address")
         if len(address) == 0:
-            return "Please input the address",406
+            return "Please input the address",407
         zip_code = request.args.get("zip_code")
         if zip_code == 0:
-            return "Please input the zip code",406
+            return "Please input the zip code",407
 
         # 判断store是否已经存在
         store_exist = Store.query.get(store_assigned)
@@ -184,7 +188,7 @@ def store_register():
 
         if store_repeated:
             flash("store id existed")
-            return "store id existed",406
+            return "store id existed",408
 
         store = Store(store_id=store_id,
                       address=address,
@@ -206,13 +210,13 @@ def register_region():
 
         region_id = request.args.get("region_id")
         if region_id == 0:
-            return "Please input region id",406
+            return "Please input region id",407
         region_name = request.args.get("region_name")
         if len(region_name) == 0:
-            return "Please input region name",406
+            return "Please input region name",407
         region_manager = request.args.get("region_manager")
         if len(region_manager) == 0:
-            return "Please input region manager",406
+            return "Please input region manager",407
 
         # 判断region_id是否重复
         region_repeated = Region.query.get(region_id)
@@ -251,7 +255,7 @@ def login():
                 return "Account login successfully",200
             else:
                 flash('Password incorrect')
-                return "Password incorrect",406
+                return "Password incorrect",407
 
 
 if __name__ == '__main__':
