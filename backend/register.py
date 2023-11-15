@@ -3,7 +3,7 @@
 # 2. 在运行该文档前，请将在db_Info文档中填写您关于database的相关信息
 
 
-from flask import Flask, render_template, request, flash, make_response
+from flask import Flask, render_template, request, flash, jsonify
 from flask_sqlalchemy import  SQLAlchemy
 import initDatabase
 import dbInfo
@@ -299,8 +299,9 @@ def transaction():
         db.session.commit()
 
         transaction_id = str(transaction_id)
+        notice = "transaction created successfully"
 
-        return "transaction created successfully", 200, transaction_id
+        return jsonify({'notice':notice, 'transaction_id':transaction_id}), 200
 
 
 @app.route('/sub_transaction/<transaction_id>', methods=['POST','GET'])
