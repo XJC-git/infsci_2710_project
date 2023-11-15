@@ -300,7 +300,7 @@ def transaction():
 
         transaction_id = str(transaction_id)
 
-        return "transaction created successfully", transaction_id, 200
+        return "transaction created successfully", 200, transaction_id
 
 
 @app.route('/sub_transaction/<transaction_id>', methods=['POST','GET'])
