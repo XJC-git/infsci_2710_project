@@ -258,5 +258,136 @@ def login():
                 return "Password incorrect",513
 
 
+@app.route('/transaction', methods=['POST','GET'])
+def transaction():
+    if request.method == "POST":
+        # 获取表格
+        Transaction = initDatabase.Transactions
+        Customer = initDatabase.Customers
+        Salesperson = initDatabase.Salespersons
+
+        # 获取数据
+        date = request.args.get("date")
+        if len(date) == 0:
+            return "Please input date", 512
+        salesperson_id = request.args.get("salesperson_id")
+        if len(salesperson_id) == 0:
+            return "Please input salesperson id", 512
+        customer_id = request.args.get("customer_id")
+        if len(customer_id) == 0:
+            return "Please input customer id", 512
+
+        # 判断用户和售货员是否存在
+        customer_existed = Customer.query.get(customer_id)
+        salesperson_existed = Salesperson.query.get(salesperson_id)
+
+        if not customer_existed:
+            return "The customer doesn't exist", 513
+        if not salesperson_existed:
+            return "The salesperson doesn't exist", 514
+
+        # 生成订单id
+        count = Transaction.query.count()
+        transaction_id = count + 1
+
+        # 存入数据库
+        transaction = Transaction(transaction_id=transaction_id,
+                                  date=date,
+                                  salesperson_id=salesperson_id,
+                                  customer_id=customer_id)
+        db.session.add(transaction)
+        db.session.commit()
+
+        transaction_id = str(transaction_id)
+
+        return "transaction created successfully", transaction_id, 200
+
+
+@app.route('/sub_transaction/<transaction_id>', methods=['POST','GET'])
+def sub_transaction(transaction_id):
+    if request.method == "POST":
+        # 获取表格
+        Sub_Transaction = initDatabase.Sub_Transactions
+        Product = initDatabase.Products
+
+        # 获取数据
+        product_id = request.args.get("product_id")
+        if product_id == 0:
+            return "Please choose the product", 512
+        quantity = request.args.get("quantity")
+        if quantity == 0:
+            return "Please input the quantity", 512
+
+        product_existed = Product.query.get(product_id)
+        if not product_existed:
+            return "product doesn't existed", 513
+
+        amount = product_existed.inventory_amount
+        if amount < quantity:
+            return "There is no enough product", 514
+
+        # 生成子订单id
+        count = Sub_Transaction.query.count()
+        sub_transaction_id = count + 1
+
+        # 存入数据
+        length = len(product_id)
+        for i in range(length):
+            temp_product = product_id[i]
+            temp_quantity = quantity[i]
+            sub_transaction = Sub_Transaction(sub_transaction_id=sub_transaction_id,
+                                              product_id=temp_product,
+                                              transaction_id=int(transaction_id),
+                                              quantity=temp_quantity)
+            db.session.add(sub_transaction)
+            # 还要再修改原本的product的存量
+            sub_transaction_id = sub_transaction_id + 1
+
+        db.session.commit()
+
+
+@app.route('/product', methods=['POST','GET'])
+def product():
+    # if request.method == "GET":
+    #     return render_template("testing.html")
+    if request.method == "POST":
+        # 获取表格
+        Product = initDatabase.Products
+
+        # 获取数据
+        name = request.args.get("name")
+        if len(name) == 0:
+            flash("Please input the name")
+            return "Please input the name", 512
+        category = request.args.get("category")
+        if len(category) == 0:
+            flash("Please input the category")
+            return "Please input the catetory", 512
+        price = request.args.get("price")
+        if price == 0:
+            flash("Please input the price")
+            return "Please input the price", 512
+        inventory_amount = request.args.get("inventory_amount")
+        # inventory_amount可以为0
+
+        # 获取目前在列表中已经存在的product数量
+        count = Product.query.count()
+        product_id = count + 1
+
+        # 存入数据
+        product = Product(product_id=product_id,
+                          name=name,
+                          category=category,
+                          price=price,
+                          inventory_amount=inventory_amount)
+        print(product_id, name, category, inventory_amount)
+        db.session.add(product)
+        db.session.commit()
+        flash("product create successfully")
+        return "product create successfully", 200
+
+        #return render_template("testing.html")
+
+
 if __name__ == '__main__':
     app.run()
