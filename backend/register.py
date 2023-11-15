@@ -7,6 +7,7 @@ from flask import Flask, render_template, request, flash, jsonify
 from flask_sqlalchemy import  SQLAlchemy
 import initDatabase
 import dbInfo
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://" + dbInfo.user_name + ":" + dbInfo.password + "@" + dbInfo.host + "/" + dbInfo.db_name
@@ -270,6 +271,10 @@ def transaction():
         date = request.args.get("date")
         if len(date) == 0:
             return "Please input date", 512
+
+        # 将日期的str转为date格式
+        date_date = datetime.strptime(date, "%Y-%m-%d").date()
+
         salesperson_id = request.args.get("salesperson_id")
         if len(salesperson_id) == 0:
             return "Please input salesperson id", 512
@@ -292,7 +297,7 @@ def transaction():
 
         # 存入数据库
         transaction = Transaction(transaction_id=transaction_id,
-                                  date=date,
+                                  date=date_date,
                                   salesperson_id=salesperson_id,
                                   customer_id=customer_id)
         db.session.add(transaction)
