@@ -320,17 +320,8 @@ def sub_transaction(transaction_id):
         product_id = request.args.get("product_id")
         if product_id == 0:
             return "Please choose the product", 512
+
         quantity = request.args.get("quantity")
-        if quantity == 0:
-            return "Please input the quantity", 512
-
-        product_existed = Product.query.get(product_id)
-        if not product_existed:
-            return "product doesn't existed", 513
-
-        amount = product_existed.inventory_amount
-        if amount < quantity:
-            return "There is no enough product", 514
 
         # 生成子订单id
         count = Sub_Transaction.query.count()
@@ -341,6 +332,18 @@ def sub_transaction(transaction_id):
         for i in range(length):
             temp_product = product_id[i]
             temp_quantity = quantity[i]
+
+            if temp_quantity == 0:
+                return "Please input the quantity", 512
+
+            product_existed = Product.query.get(temp_product)
+            if not product_existed:
+                return "product doesn't existed", 513
+
+            amount = product_existed.inventory_amount
+            if amount < temp_quantity:
+                return "There is no enough product", 514
+
             sub_transaction = Sub_Transaction(sub_transaction_id=sub_transaction_id,
                                               product_id=temp_product,
                                               transaction_id=int(transaction_id),
