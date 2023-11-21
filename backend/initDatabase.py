@@ -78,6 +78,7 @@ class Products(db.Model):
     category = db.Column(db.String(48))
     price = db.Column(db.Float)
     inventory_amount = db.Column(db.Integer)
+    avatar = db.Column(db.String(150))
 
 
 class Transactions(db.Model):
