@@ -3,7 +3,7 @@ import getConfig from 'next/config';
 const { publicRuntimeConfig } = getConfig();
 
 const axios_instance = axios.create({
-    baseURL: publicRuntimeConfig.backendUrl,
+    baseURL: '/api',
 });
 
 export default axios_instance;
