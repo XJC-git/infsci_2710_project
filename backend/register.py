@@ -357,8 +357,6 @@ def sub_transaction(transaction_id):
 
 @app.route('/product', methods=['POST','GET'])
 def product():
-    # if request.method == "GET":
-    #     return render_template("testing.html")
     if request.method == "POST":
         # 获取表格
         Product = initDatabase.Products
@@ -395,7 +393,109 @@ def product():
         flash("product create successfully")
         return "product create successfully", 200
 
-        #return render_template("testing.html")
+
+# delete function：
+# -----------------------------------------------
+# -----------------------------------------------
+@app.route('/delete/product', methods=['GET','POST'])
+def delete_product():
+    if request.method == "GET":
+        # 获取表格
+        Product = initDatabase.Products
+
+        all_product = Product.query.all()
+
+        return jsonify({'all_product':all_product}), 200
+    if request.method == "POST":
+        # 获取表格
+        Product = initDatabase.Products
+        # 获取前端返回的id
+        product_id = request.args.get("product_id")
+
+        # 查看该product是否存在
+        product_existed = Product.query.get(product_id)
+        if not product_existed:
+            return "The product doesn't exist", 512
+
+        # 如果存在，删除
+        try:
+            delete_statement = "DELETE FROM products WHERE product_id = " + str(product_id)
+            db.session.execute(delete_statement)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return f"false: {str(e)}", 513
+
+        return "The product is deleted correctly", 200
+
+
+@app.route('/delete/sub_transaction',methods=['GET','POST'])
+def delete_sub_transaction():
+    if request.method == "GET":
+        # 要和transactions联合
+        try:
+            query_statement = "SELECT * FROM sub_transactions JOIN transactions ON sub_transactions.transaction_id = transactions.transaction_id"
+            all_transactions = db.engine.execute(query_statement)
+        except Exception as e:
+            return f"false: {str(e)}", 512
+
+        return jsonify({"all_transactions":all_transactions}), 200
+
+    if request.method == "POST":
+        # 获取表
+        Sub_Transaction = initDatabase.Sub_Transactions
+
+        # 向前端获取sub_transaction_id
+        sub_transaction_id = request.args.get("sub_transaction_id")
+
+        # 判断该订单是否存在
+        sub_transaction_existed = Sub_Transaction.query.get(sub_transaction_id)
+        if not sub_transaction_existed:
+            return "the transaction not existed", 513
+
+        # 如果存在，开始删除
+        # 先判断该子订单是否是最后一个子订单，如果是，则连同主订单一起删除
+        # 获取主订单id
+        transaction_id = sub_transaction_existed.transaction_id
+        # 获取计数
+        count = Sub_Transaction.query.filter_by(transaction_id=transaction_id).count()
+        # 删除子订单
+        delete_query = "DELETE FROM sub_transactions WHERE sub_transaction_id = " + str(sub_transaction_id)
+        db.session.execute(delete_query)
+        # 如果计数是1，删除主订单
+        if count == 1:
+            delete_query_2 = "DELETE FROM transactions WHERE transaction_id = " + str(transaction_id)
+            db.session.execute(delete_query_2)
+        db.session.commit()
+        return "delete correctly", 200
+
+
+# query function：
+# -----------------------------------------------
+# -----------------------------------------------
+@app.route('/query/product', methods=['GET'])
+def query_product():
+    if request.method == "GET":
+        # 获取表格
+        Product = initDatabase.Products
+
+        all_product = Product.query.all()
+
+        return jsonify({'all_product':all_product}), 200
+
+
+@app.route('/query/sub_transaction', methods=['GET'])
+def query_sub_transaction():
+    if request.method == "GET":
+        # 要和transactions联合
+        try:
+            query_statement = "SELECT * FROM sub_transactions JOIN transactions ON sub_transactions.transaction_id = transactions.transaction_id"
+            all_transactions = db.engine.execute(query_statement)
+        except Exception as e:
+            return f"false: {str(e)}", 512
+
+        return jsonify({"all_transactions":all_transactions}), 200
+
 
 
 if __name__ == '__main__':
