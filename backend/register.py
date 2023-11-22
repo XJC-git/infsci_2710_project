@@ -530,7 +530,7 @@ def query_product():
         for temp in all_product:
             product_dict = {'product_id': temp.product_id, 'name': temp.name,
                             'category': temp.category, 'price': temp.price,
-                            'inventory_amount': temp.inventory_amount}
+                            'inventory_amount': temp.inventory_amount, 'avatar':temp.avatar}
             product_dicts.append(product_dict)
 
         db.session.remove()
@@ -578,7 +578,7 @@ def query_productID():
         # 将查询结果封装成字典
         product_dict = {'product_id':product_result.product_id, 'name':product_result.name,
                         'category':product_result.category, 'price':product_result.price,
-                        'inventory_amount':product_result.inventory_amount}
+                        'inventory_amount':product_result.inventory_amount, 'avatar':product_result.avatar}
 
         db.session.remove()
         return json.dumps(product_dict), 200
