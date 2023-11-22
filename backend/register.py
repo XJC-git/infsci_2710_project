@@ -17,8 +17,8 @@ db = SQLAlchemy(app)
 app.secret_key='kdjklfjkd87384hjdhjh'
 
 # 防止数据库连接超时
-SQLALCHEMY_POOL_SIZE = 100
-SQLALCHEMY_POOL_TIMEOUT = 1000
+SQLALCHEMY_POOL_SIZE = 500
+SQLALCHEMY_POOL_TIMEOUT = 5000
 
 @app.route('/register', methods=['GET','POST'])
 def register():
@@ -517,6 +517,44 @@ def delete_sub_transaction():
 # query function：
 # -----------------------------------------------
 # -----------------------------------------------
+@app.route('/query/transaction/customerID', methods=['POST'])
+def query_transaction_customerID():
+    if request.method == "POST":
+        # 获取表格
+        Customer = initDatabase.Customers
+
+        # 获取用户ID
+        customer_id = request.args.get("customer_id")
+
+        customer_get = Customer.query.get(customer_id)
+        if not customer_get:
+            db.session.remove()
+            return "customer doesn't existed", 512
+
+        # 根据customerID 查找订单
+        query_statement = ("SELECT * FROM sub_transactions "
+                           "JOIN transactions ON sub_transactions.transaction_id = transactions.transaction_id "
+                           "WHERE transactions.customer_id = " + str(customer_id))
+        try:
+            all_transactions = db.engine.execute(query_statement)
+        except Exception as e:
+            db.session.remove()
+            return f"false: {str(e)}", 513
+
+        transaction_dicts = []
+        for temp in all_transactions:
+            transaction_dict = {'transaction_id': temp.transaction_id, 'date': temp.date,
+                                'salesperson_id': temp.salesperson_id,
+                                'customer_id': temp.customer_id,
+                                'sub_transaction_id': temp.sub_transaction_id,
+                                'product_id': temp.product_id,
+                                'quantity': temp.quantity}
+            transaction_dicts.append(transaction_dict)
+
+        db.session.remove()
+        return json.dumps(transaction_dicts), 200
+
+
 @app.route('/query/product', methods=['GET'])
 def query_product():
     if request.method == "GET":
