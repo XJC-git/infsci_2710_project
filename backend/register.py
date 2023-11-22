@@ -17,8 +17,8 @@ db = SQLAlchemy(app)
 app.secret_key='kdjklfjkd87384hjdhjh'
 
 # 防止数据库连接超时
-SQLALCHEMY_POOL_SIZE = 20
-SQLALCHEMY_POOL_TIMEOUT = 300
+SQLALCHEMY_POOL_SIZE = 100
+SQLALCHEMY_POOL_TIMEOUT = 1000
 
 @app.route('/register', methods=['GET','POST'])
 def register():
