@@ -74,6 +74,10 @@ export default function shoppingCart(){
                         </>
                 }
 
+                <div className="flex flex-row justify-end ml-4 mr-4">
+                    <button className="flex outline-none bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-800">Submit Order</button>
+                </div>
+
 
 
             </div>
