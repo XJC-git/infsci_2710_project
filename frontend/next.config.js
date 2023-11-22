@@ -13,7 +13,7 @@ const nextConfig = {
     async rewrites() {
         return [
             {
-                source: '/api/:path*',
+                source: '/project/:path*',
                 destination: process.env.NEXT_PUBLIC_SERVER_URL+'/:path*' // Proxy to Backend
             }
         ]
