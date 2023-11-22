@@ -17,8 +17,8 @@ db = SQLAlchemy(app)
 app.secret_key='kdjklfjkd87384hjdhjh'
 
 # 防止数据库连接超时
-SQLALCHEMY_POOL_SIZE = 500
-SQLALCHEMY_POOL_TIMEOUT = 5000
+SQLALCHEMY_POOL_SIZE = 20
+SQLALCHEMY_POOL_TIMEOUT = 300
 
 @app.route('/register', methods=['GET','POST'])
 def register():
@@ -604,19 +604,19 @@ def query_sub_transaction():
 def query_productID():
     if request.method == "POST":
         # 获取表格
-        Product = initDatabase.Products
-
         product_id = request.args.get("product_id")
+
         # 根据id查找
-        product_result = Product.query.get(product_id)
+        query_statement = "SELECT * FROM products WHERE product_id = " + str(product_id)
+        product_result = db.engine.execute(query_statement)
         if not product_result:
             db.session.remove()
             return "Product doesn't existed", 512
 
         # 将查询结果封装成字典
-        product_dict = {'product_id':product_result.product_id, 'name':product_result.name,
-                        'category':product_result.category, 'price':product_result.price,
-                        'inventory_amount':product_result.inventory_amount, 'avatar':product_result.avatar}
+        product_dict = {'product_id': product_result.product_id, 'name': product_result.name,
+                        'category': product_result.category, 'price': product_result.price,
+                        'inventory_amount': product_result.inventory_amount}
 
         db.session.remove()
         return json.dumps(product_dict), 200
@@ -628,7 +628,7 @@ def users_judge():
     if request.method == "POST":
         user_id = request.args.get("user_id")
         # 根据user_id查找
-        query_statement = "SELECT * FROM user WHERE user_id = " + str(user_id)
+        query_statement = "SELECT * FROM user WHERE user_id = '" + str(user_id) + "'"
         user = db.engine.execute(query_statement)
 
         # 如果用户不存在，报错
@@ -637,7 +637,7 @@ def users_judge():
             return "user doesn't existed!", 512
 
         # 如果存在，则在customer中查找
-        query_statement_2 = "SELECT * FROM customers WHERE customer_id = " + str(user_id)
+        query_statement_2 = "SELECT * FROM customers WHERE customer_id = '" + str(user_id) + "'"
         user_type = db.engine.execute(query_statement_2)
         # 如果不存在，则用户是管理员
         if not user_type:
