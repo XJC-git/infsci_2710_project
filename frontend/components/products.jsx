@@ -29,6 +29,9 @@ export default function Products(){
                                             <div className="flex text-lg font-bold">
                                                 {product.name}
                                             </div>
+                                            <div className="flex text-sm text-gray-400">
+                                                {product.category}
+                                            </div>
                                             <div className="flex text-lg font-bold text-blue-500">
                                                 $ {product.price}
                                             </div>
@@ -43,7 +46,7 @@ export default function Products(){
                                                 </>
                                                 :
                                                 <>
-                                                    <svg className="text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z"></path></svg>
+                                                    <svg className="text-gray-400 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z"></path></svg>
                                                     <div className="text-gray-400">
                                                         Not Available
                                                     </div>
