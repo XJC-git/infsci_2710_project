@@ -1,10 +1,23 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Transition} from "@headlessui/react";
+import {useRouter} from "next/router";
+import {useCart, useUserID} from "./state";
+import useFromStore from "./store";
 
 const rec = ['iPhone 15','laptop','headphones']
 export default function TaskBar(){
+    const router = useRouter();
+    const path = router.asPath
     const [menu,setMenu] = useState(false)
     const [searchPopup,setSearchPopup] = useState(false)
+    const userID = useFromStore(useUserID,state => state.userID)
+    const {amounts} = useCart()
+    const [total,setTotal] = useState(0)
+    useEffect(() => {
+        setTotal(amounts?.reduce((a, b) => {
+            return a + b;
+        },0));
+    }, [amounts]);
     return(
         <>
             <nav className="p-6 md:px-10">
@@ -38,7 +51,7 @@ export default function TaskBar(){
                             </a>
                         </div>
                         <div>
-                            <a href="/docs/help" className="block rounded-lg bg-gray-100 p-4 text-xl font-bold hover:bg-gray-200 hover:text-gray-600 text-gray-400">
+                            <a href="/shoppingCart" className="block rounded-lg bg-gray-100 p-4 text-xl font-bold hover:bg-gray-200 hover:text-gray-600 text-gray-400">
                                 ShoppingCart
                             </a>
                         </div>
@@ -57,11 +70,16 @@ export default function TaskBar(){
                 {/*Center Buttons*/}
                 <div className="flex h-12 flex-1 items-center justify-between sm:h-14">
                     <div className="hidden md:flex md:flex-1  gap-12">
-                        <a href="/" aria-current="page" className="text-xl font-bold hover:text-gray-600 nuxt-link-exact-active nuxt-link-active text-gray-800">
+                        <a href="/home" className={(path==="/home"?"text-gray-800":"text-gray-400")+" text-xl font-bold hover:text-gray-600"}>
                             Home
                         </a>
-                        <a href="/docs/help" className="text-xl font-bold hover:text-gray-600 text-gray-400">
-                            ShoppingCart
+                        <a href="/shoppingCart" className={(path==="/shoppingCart"?"text-gray-800":"text-gray-400")+" flex flex-row gap-2 text-xl font-bold hover:text-gray-600"}>
+                            <div className="flex">
+                                ShoppingCart
+                            </div>
+                            <div className="flex rounded-lg bg-gray-400 text-white w-min pl-1 pr-1">
+                                {total}
+                            </div>
                         </a>
 
                     </div>
@@ -78,11 +96,12 @@ export default function TaskBar(){
                                 <span className="flex text-lg text-gray-600 whitespace-nowrap">Search products, stores....</span>
                             </div>
                         </a>
+
                         <a href="/login/user" className="whitespace-nowrap rounded-lg px-4 py-2 text-lg font-bold text-gray-600 ring-1 ring-gray-600
                     hover:text-gray-800
                     hover:ring-gray-800
                     hover:ring-2">
-                            Log in
+                            {userID===0?"Log in":userID}
                         </a>
                     </div>
                 </div>

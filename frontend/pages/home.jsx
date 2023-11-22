@@ -1,8 +1,11 @@
 import Head from "next/head";
 import TaskBar from "../components/taskbar";
 import Products from "../components/products";
+import {useRouter} from "next/router";
 
 export default function Home(){
+    const router = useRouter();
+
     return(
         <>
             <Head>

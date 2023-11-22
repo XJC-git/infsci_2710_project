@@ -3,6 +3,7 @@ import axios_instance from "app/axios";
 import {useRouter} from "next/router";
 import {Transition} from "@headlessui/react";
 import Notification from "../../components/notification";
+import {useUserID} from "../../components/state";
 
 export default function User(){
     const router = useRouter();
@@ -10,19 +11,22 @@ export default function User(){
     const [showNotification,setShowNotification] = useState(false)
     const [typeNotification,setTypeNotification] = useState('success')
     const [contextNotification,setContextNotification] = useState('EMPTY MSG')
-
+    const setUserID = useUserID((state)=>state.setUserID)
     function handleLogin(){
         const username = document.querySelector("#username").value;
         const password = document.querySelector("#password").value;
+
         axios_instance.post('/login',null,{params:{
             'user_id':username,
             'password':password
         }}).then((res) => {
+            setUserID(username)
             setTypeNotification('success')
             setContextNotification(res.data)
             setShowNotification(true)
             setTimeout(function() {
                 setShowNotification(false)
+                router.push("/home")
             }, 2000);
         }).catch((error)=>{
             if(error.response){
