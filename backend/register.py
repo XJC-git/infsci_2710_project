@@ -3,11 +3,12 @@
 # 2. 在运行该文档前，请将在db_Info文档中填写您关于database的相关信息
 
 
-from flask import Flask, render_template, request, flash, jsonify
+from flask import Flask, request, flash, jsonify
 from flask_sqlalchemy import  SQLAlchemy
 import initDatabase
 import dbInfo
 from datetime import datetime
+import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://" + dbInfo.user_name + ":" + dbInfo.password + "@" + dbInfo.host + "/" + dbInfo.db_name
@@ -481,7 +482,7 @@ def query_product():
 
         all_product = Product.query.all()
 
-        return jsonify({'all_product':all_product}), 200
+        return jsonify(dict(all_product=all_product)), 200
 
 
 @app.route('/query/sub_transaction', methods=['GET'])
@@ -494,8 +495,22 @@ def query_sub_transaction():
         except Exception as e:
             return f"false: {str(e)}", 512
 
-        return jsonify({"all_transactions":all_transactions}), 200
+        return jsonify(dict(all_transactions=all_transactions)), 200
 
+
+@app.route('/query/productID', methods=['POST'])
+def query_productID():
+    if request.method == "POST":
+        # 获取表格
+        Product = initDatabase.Products
+
+        product_id = request.args.get("product_id")
+        # 根据id查找
+        product_result = Product.query.get(product_id)
+        if not product_result:
+            return "Product doesn't existed", 512
+
+        return json.dumps(dict(product=product_result)), 200
 
 
 if __name__ == '__main__':
