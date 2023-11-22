@@ -4,7 +4,7 @@
 
 
 from flask import Flask, request, flash, jsonify
-from flask_sqlalchemy import  SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 import initDatabase
 import dbInfo
 from datetime import datetime
@@ -482,7 +482,11 @@ def query_product():
 
         all_product = Product.query.all()
 
-        return jsonify(dict(all_product=all_product)), 200
+        product_dict = {'product_id': all_product.product_id, 'name': all_product.name,
+                        'category': all_product.category, 'price': all_product.price,
+                        'inventory_amount': all_product.inventory_amount}
+
+        return jsonify(product_dict), 200
 
 
 @app.route('/query/sub_transaction', methods=['GET'])
@@ -495,7 +499,12 @@ def query_sub_transaction():
         except Exception as e:
             return f"false: {str(e)}", 512
 
-        return jsonify(dict(all_transactions=all_transactions)), 200
+        transactions_dict = {'transaction_id':all_transactions.transaction_id, 'date':all_transactions.date,
+                             'salesperson_id':all_transactions.salesperson_id, 'customer_id':all_transactions.customer_id,
+                             'sub_transaction_id':all_transactions.sub_transaction_id, 'product_id':all_transactions.product_id,
+                             'quantity':all_transactions.quantity}
+
+        return jsonify(transactions_dict), 200
 
 
 @app.route('/query/productID', methods=['POST'])
@@ -510,7 +519,12 @@ def query_productID():
         if not product_result:
             return "Product doesn't existed", 512
 
-        return json.dumps(dict(product=product_result)), 200
+        # 将查询结果封装成字典
+        product_dict = {'product_id':product_result.product_id, 'name':product_result.name,
+                        'category':product_result.category, 'price':product_result.price,
+                        'inventory_amount':product_result.inventory_amount}
+
+        return json.dumps(product_dict), 200
 
 
 if __name__ == '__main__':
