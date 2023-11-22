@@ -533,7 +533,7 @@ def query_product():
                             'inventory_amount': temp.inventory_amount, 'avatar':temp.avatar}
             product_dicts.append(product_dict)
 
-        db.session.remove()
+        db.session.close()
         return json.dumps(product_dicts), 200
 
 
