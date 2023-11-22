@@ -584,5 +584,10 @@ def query_productID():
         return json.dumps(product_dict), 200
 
 
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()
+
+
 if __name__ == '__main__':
     app.run()
