@@ -71,18 +71,23 @@ def customer_register(customer_id):
 
         address = request.args.get("address")
         if len(address) == 0:
+            db.session.remove()
             return "Please input the address!",512
         state = request.args.get("state")
         if len(state) == 0:
+            db.session.remove()
             return "Please input the state",512
         city = request.args.get("city")
         if len(city) == 0:
+            db.session.remove()
             return "Please input the city",512
         zip_code = request.args.get("zip_code")
         if zip_code == 0:
+            db.session.remove()
             return "Please input the zip code",512
         kind = request.args.get("kind")
         if len(kind) == 0:
+            db.session.remove()
             return "Please input the kind",512
         customer_id = customer_id
         flash("Account created successfully.")
@@ -94,6 +99,7 @@ def customer_register(customer_id):
                             kind=kind)
         db.session.add(customer)
         db.session.commit()
+        db.session.remove()
         return "Account created successfully.",200
 
 
@@ -105,30 +111,39 @@ def salesperson_register(salesperson_id):
 
         name = request.args.get("name")
         if len(name) == 0:
+            db.session.remove()
             return "Please input the name",512
         email = request.args.get("email")
         if len(email) == 0:
+            db.session.remove()
             return "Please input the email",512
         job_title = request.args.get("job_title")
         if len(job_title) == 0:
+            db.session.remove()
             return "Please input the job title",512
         store_assigned = request.args.get("store_assigned")
         if store_assigned == 0:
+            db.session.remove()
             return "Please input the store assigned",512
         salary = request.args.get("salary")
         if salary == 0:
+            db.session.remove()
             return "Please input the salary",512
         state = request.args.get("state")
         if len(state) == 0:
+            db.session.remove()
             return "Please input the state",512
         city = request.args.get("city")
         if len(city) == 0:
+            db.session.remove()
             return "Please input the city",512
         address = request.args.get("address")
         if len(address) == 0:
+            db.session.remove()
             return "Please input the address",512
         zip_code = request.args.get("zip_code")
         if zip_code == 0:
+            db.session.remove()
             return "Please input the zip code",512
 
         # 判断store是否已经存在
@@ -136,6 +151,7 @@ def salesperson_register(salesperson_id):
 
         if not store_exist:
             flash("Store doesn't exist")
+            db.session.remove()
             return "Store doesn't exist",513
 
         salesperson = Salesperson(salesperson_id=salesperson_id,
@@ -152,6 +168,7 @@ def salesperson_register(salesperson_id):
         db.session.add(salesperson)
         db.session.commit()
         flash("salesperson create successfully")
+        db.session.remove()
         return "salesperson create successfully",200
 
 
@@ -163,24 +180,31 @@ def store_register():
 
         store_id = request.args.get("store_id")
         if store_id == 0:
+            db.session.remove()
             return "Please input store id",512
         address = request.args.get("address")
         if len(address) == 0:
+            db.session.remove()
             return "Please input the address",512
         state = request.args.get("state")
         if len(state) == 0:
+            db.session.remove()
             return "Please input the state",512
         city = request.args.get("city")
         if len(city) == 0:
+            db.session.remove()
             return "Please input the city",512
         manager = request.args.get("manager")
         if len(manager) == 0:
+            db.session.remove()
             return "Please input the manager",512
         number_of_salesperson = request.args.get("salesperson")
         if number_of_salesperson == 0:
+            db.session.remove()
             return "Please input the number of salesperson",512
         region = request.args.get("region")
         if region == 0:
+            db.session.remove()
             return "Please input the region",512
 
         # 判断region是否已经存在
@@ -188,6 +212,7 @@ def store_register():
 
         if not region_exist:
             flash("region doesn't exist")
+            db.session.remove()
             return "region doesn't exist",513
 
         # 判断store_id是否重复
@@ -195,6 +220,7 @@ def store_register():
 
         if store_repeated:
             flash("store id existed")
+            db.session.remove()
             return "store id existed",514
 
         store = Store(store_id=store_id,
@@ -207,6 +233,7 @@ def store_register():
         db.session.add(store)
         db.session.commit()
         flash("store create successfully")
+        db.session.remove()
         return "store create successfully",200
 
 
@@ -217,12 +244,15 @@ def register_region():
 
         region_id = request.args.get("region_id")
         if region_id == 0:
+            db.session.remove()
             return "Please input region id",512
         region_name = request.args.get("region_name")
         if len(region_name) == 0:
+            db.session.remove()
             return "Please input region name",512
         region_manager = request.args.get("region_manager")
         if len(region_manager) == 0:
+            db.session.remove()
             return "Please input region manager",512
 
         # 判断region_id是否重复
@@ -230,6 +260,7 @@ def register_region():
 
         if region_repeated:
             flash("region id existed")
+            db.session.remove()
             return "region id existed",513
 
         region = Region(region_id=region_id,
@@ -238,6 +269,7 @@ def register_region():
         db.session.add(region)
         db.session.commit()
         flash("region create successfully")
+        db.session.remove()
         return "region create successfully",200
 
 
@@ -254,14 +286,17 @@ def login():
 
         if not user_id:
             flash("Account doesn't exist")
+            db.session.remove()
             return "Account doesn't exist",512
         else:
             password = User.query.get(user_id_input).password
             if password_input == password:
                 flash('Account login successfully')
+                db.session.remove()
                 return "Account login successfully",200
             else:
                 flash('Password incorrect')
+                db.session.remove()
                 return "Password incorrect",513
 
 
@@ -276,6 +311,7 @@ def transaction():
         # 获取数据
         date = request.args.get("date")
         if len(date) == 0:
+            db.session.remove()
             return "Please input date", 512
 
         # 将日期的str转为date格式
@@ -283,9 +319,11 @@ def transaction():
 
         salesperson_id = request.args.get("salesperson_id")
         if len(salesperson_id) == 0:
+            db.session.remove()
             return "Please input salesperson id", 512
         customer_id = request.args.get("customer_id")
         if len(customer_id) == 0:
+            db.session.remove()
             return "Please input customer id", 512
 
         # 判断用户和售货员是否存在
@@ -293,8 +331,10 @@ def transaction():
         salesperson_existed = Salesperson.query.get(salesperson_id)
 
         if not customer_existed:
+            db.session.remove()
             return "The customer doesn't exist", 513
         if not salesperson_existed:
+            db.session.remove()
             return "The salesperson doesn't exist", 514
 
         # 生成订单id
@@ -311,7 +351,7 @@ def transaction():
 
         transaction_id = str(transaction_id)
         notice = "transaction created successfully"
-
+        db.session.remove()
         return jsonify({'notice':notice, 'transaction_id':transaction_id}), 200
 
 
@@ -325,6 +365,7 @@ def sub_transaction(transaction_id):
         # 获取数据
         product_id = request.args.get("product_id")
         if product_id == 0:
+            db.session.remove()
             return "Please choose the product", 512
 
         quantity = request.args.get("quantity")
@@ -340,14 +381,17 @@ def sub_transaction(transaction_id):
             temp_quantity = quantity[i]
 
             if temp_quantity == 0:
+                db.session.remove()
                 return "Please input the quantity", 512
 
             product_existed = Product.query.get(temp_product)
             if not product_existed:
+                db.session.remove()
                 return "product doesn't existed", 513
 
             amount = product_existed.inventory_amount
             if amount < temp_quantity:
+                db.session.remove()
                 return "There is no enough product", 514
 
             sub_transaction = Sub_Transaction(sub_transaction_id=sub_transaction_id,
@@ -359,6 +403,8 @@ def sub_transaction(transaction_id):
             sub_transaction_id = sub_transaction_id + 1
 
         db.session.commit()
+        db.session.remove()
+        return "sub_transaction created correctly", 200
 
 
 @app.route('/product', methods=['POST','GET'])
@@ -371,14 +417,17 @@ def product():
         name = request.args.get("name")
         if len(name) == 0:
             flash("Please input the name")
+            db.session.remove()
             return "Please input the name", 512
         category = request.args.get("category")
         if len(category) == 0:
             flash("Please input the category")
+            db.session.remove()
             return "Please input the catetory", 512
         price = request.args.get("price")
         if price == 0:
             flash("Please input the price")
+            db.session.remove()
             return "Please input the price", 512
         inventory_amount = request.args.get("inventory_amount")
         # inventory_amount可以为0
@@ -397,6 +446,7 @@ def product():
         db.session.add(product)
         db.session.commit()
         flash("product create successfully")
+        db.session.remove()
         return "product create successfully", 200
 
 
@@ -405,13 +455,6 @@ def product():
 # -----------------------------------------------
 @app.route('/delete/product', methods=['GET','POST'])
 def delete_product():
-    if request.method == "GET":
-        # 获取表格
-        Product = initDatabase.Products
-
-        all_product = Product.query.all()
-
-        return jsonify({'all_product':all_product}), 200
     if request.method == "POST":
         # 获取表格
         Product = initDatabase.Products
@@ -421,6 +464,7 @@ def delete_product():
         # 查看该product是否存在
         product_existed = Product.query.get(product_id)
         if not product_existed:
+            db.session.remove()
             return "The product doesn't exist", 512
 
         # 如果存在，删除
@@ -430,23 +474,15 @@ def delete_product():
             db.session.commit()
         except Exception as e:
             db.session.rollback()
+            db.session.remove()
             return f"false: {str(e)}", 513
 
+        db.session.remove()
         return "The product is deleted correctly", 200
 
 
 @app.route('/delete/sub_transaction',methods=['GET','POST'])
 def delete_sub_transaction():
-    if request.method == "GET":
-        # 要和transactions联合
-        try:
-            query_statement = "SELECT * FROM sub_transactions JOIN transactions ON sub_transactions.transaction_id = transactions.transaction_id"
-            all_transactions = db.engine.execute(query_statement)
-        except Exception as e:
-            return f"false: {str(e)}", 512
-
-        return jsonify({"all_transactions":all_transactions}), 200
-
     if request.method == "POST":
         # 获取表
         Sub_Transaction = initDatabase.Sub_Transactions
@@ -457,6 +493,7 @@ def delete_sub_transaction():
         # 判断该订单是否存在
         sub_transaction_existed = Sub_Transaction.query.get(sub_transaction_id)
         if not sub_transaction_existed:
+            db.session.remove()
             return "the transaction not existed", 513
 
         # 如果存在，开始删除
@@ -473,6 +510,7 @@ def delete_sub_transaction():
             delete_query_2 = "DELETE FROM transactions WHERE transaction_id = " + str(transaction_id)
             db.session.execute(delete_query_2)
         db.session.commit()
+        db.session.remove()
         return "delete correctly", 200
 
 
@@ -487,11 +525,16 @@ def query_product():
 
         all_product = Product.query.all()
 
-        product_dict = {'product_id': all_product.product_id, 'name': all_product.name,
-                        'category': all_product.category, 'price': all_product.price,
-                        'inventory_amount': all_product.inventory_amount}
+        product_dicts = []
 
-        return jsonify(product_dict), 200
+        for temp in all_product:
+            product_dict = {'product_id': temp.product_id, 'name': temp.name,
+                            'category': temp.category, 'price': temp.price,
+                            'inventory_amount': temp.inventory_amount}
+            product_dicts.append(product_dict)
+
+        db.session.remove()
+        return json.dumps(product_dicts), 200
 
 
 @app.route('/query/sub_transaction', methods=['GET'])
@@ -502,14 +545,21 @@ def query_sub_transaction():
             query_statement = "SELECT * FROM sub_transactions JOIN transactions ON sub_transactions.transaction_id = transactions.transaction_id"
             all_transactions = db.engine.execute(query_statement)
         except Exception as e:
+            db.session.remove()
             return f"false: {str(e)}", 512
 
-        transactions_dict = {'transaction_id':all_transactions.transaction_id, 'date':all_transactions.date,
-                             'salesperson_id':all_transactions.salesperson_id, 'customer_id':all_transactions.customer_id,
-                             'sub_transaction_id':all_transactions.sub_transaction_id, 'product_id':all_transactions.product_id,
-                             'quantity':all_transactions.quantity}
+        transaction_dicts = []
+        for temp in all_transactions:
+            transaction_dict = {'transaction_id':temp.transaction_id, 'date':temp.date,
+                                'salesperson_id':temp.salesperson_id,
+                                'customer_id':temp.customer_id,
+                                'sub_transaction_id':temp.sub_transaction_id,
+                                'product_id':temp.product_id,
+                                'quantity':temp.quantity}
+            transaction_dicts.append(transaction_dict)
 
-        return jsonify(transactions_dict), 200
+        db.session.remove()
+        return json.dumps(transaction_dicts), 200
 
 
 @app.route('/query/productID', methods=['POST'])
@@ -522,6 +572,7 @@ def query_productID():
         # 根据id查找
         product_result = Product.query.get(product_id)
         if not product_result:
+            db.session.remove()
             return "Product doesn't existed", 512
 
         # 将查询结果封装成字典
@@ -529,6 +580,7 @@ def query_productID():
                         'category':product_result.category, 'price':product_result.price,
                         'inventory_amount':product_result.inventory_amount}
 
+        db.session.remove()
         return json.dumps(product_dict), 200
 
 
