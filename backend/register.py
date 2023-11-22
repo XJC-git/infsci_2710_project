@@ -17,8 +17,8 @@ db = SQLAlchemy(app)
 app.secret_key='kdjklfjkd87384hjdhjh'
 
 # 防止数据库连接超时
-SQLALCHEMY_POOL_SIZE = 20
-SQLALCHEMY_POOL_TIMEOUT = 300
+SQLALCHEMY_POOL_SIZE = 500
+SQLALCHEMY_POOL_TIMEOUT = 5000
 
 @app.route('/register', methods=['GET','POST'])
 def register():
@@ -517,6 +517,44 @@ def delete_sub_transaction():
 # query function：
 # -----------------------------------------------
 # -----------------------------------------------
+@app.route('/query/transaction/customerID', methods=['POST'])
+def query_transaction_customerID():
+    if request.method == "POST":
+        # 获取表格
+        Customer = initDatabase.Customers
+
+        # 获取用户ID
+        customer_id = request.args.get("customer_id")
+
+        customer_get = Customer.query.get(customer_id)
+        if not customer_get:
+            db.session.remove()
+            return "customer doesn't existed", 512
+
+        # 根据customerID 查找订单
+        query_statement = ("SELECT * FROM sub_transactions "
+                           "JOIN transactions ON sub_transactions.transaction_id = transactions.transaction_id "
+                           "WHERE transactions.customer_id = " + str(customer_id))
+        try:
+            all_transactions = db.engine.execute(query_statement)
+        except Exception as e:
+            db.session.remove()
+            return f"false: {str(e)}", 513
+
+        transaction_dicts = []
+        for temp in all_transactions:
+            transaction_dict = {'transaction_id': temp.transaction_id, 'date': temp.date,
+                                'salesperson_id': temp.salesperson_id,
+                                'customer_id': temp.customer_id,
+                                'sub_transaction_id': temp.sub_transaction_id,
+                                'product_id': temp.product_id,
+                                'quantity': temp.quantity}
+            transaction_dicts.append(transaction_dict)
+
+        db.session.remove()
+        return json.dumps(transaction_dicts), 200
+
+
 @app.route('/query/product', methods=['GET'])
 def query_product():
     if request.method == "GET":
@@ -582,6 +620,37 @@ def query_productID():
 
         db.session.remove()
         return json.dumps(product_dict), 200
+
+
+# 判断当前用户是customer还是salesperson
+@app.route('/users/judge', methods=['POST'])
+def users_judge():
+    if request.method == "POST":
+        user_id = request.args.get("user_id")
+        # 根据user_id查找
+        query_statement = "SELECT * FROM user WHERE user_id = " + str(user_id)
+        user = db.engine.execute(query_statement)
+
+        # 如果用户不存在，报错
+        if not user:
+            db.session.remove()
+            return "user doesn't existed!", 512
+
+        # 如果存在，则在customer中查找
+        query_statement_2 = "SELECT * FROM customers WHERE customer_id = " + str(user_id)
+        user_type = db.engine.execute(query_statement_2)
+        # 如果不存在，则用户是管理员
+        if not user_type:
+            db.session.remove()
+            return "user is salesperson!", 200
+        else:
+            db.session.remove()
+            return "user is customer!", 200
+
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()
 
 
 if __name__ == '__main__':
