@@ -35,14 +35,17 @@ def register():
 
         if len(user_id) == 0:
             flash('Please input the username')
+            db.session.remove()
             return "Please input the username", 512
         if len(password_1) == 0:
             flash('Please input the password')
+            db.session.remove()
             return "Please input the password", 513
 
         # 连接数据库版本测试
         if existed_user:
             flash('User id existed!')
+            db.session.remove()
             return "User id existed!", 514
         elif password_1 == password:
             flash('Account created successfully.')
@@ -50,9 +53,11 @@ def register():
             user = User(user_id=user_id, password=password)
             db.session.add(user)
             db.session.commit()
+            db.session.remove()
             return "Account created successfully.", 200
         elif password != password_1:
             flash('The passwords entered twice are inconsistent.')
+            db.session.remove()
             return "The passwords entered twice are inconsistent.", 515
 
 
