@@ -1,5 +1,6 @@
 import Head from "next/head";
 import TaskBar from "../components/taskbar";
+import Products from "../components/products";
 
 export default function Home(){
     return(
@@ -27,6 +28,7 @@ export default function Home(){
 
                 {/*TaskBar*/}
                 <TaskBar/>
+                <Products/>
             </div>
 
 
