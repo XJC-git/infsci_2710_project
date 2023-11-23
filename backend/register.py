@@ -65,9 +65,8 @@ def register():
 
 @app.route('/register/customer/<customer_id>', methods=['GET','POST'])
 def customer_register(customer_id):
-    if request.method == "POST":
-        Customer = initDatabase.Customers
 
+    if request.method == "POST":
         address = request.args.get("address")
         if len(address) == 0:
             db.session.remove()
@@ -88,15 +87,15 @@ def customer_register(customer_id):
         if len(kind) == 0:
             db.session.remove()
             return "Please input the kind",512
-        customer_id = customer_id
+
         flash("Account created successfully.")
-        customer = Customer(customer_id=customer_id,
-                            address=address,
-                            state=state,
-                            city=city,
-                            zip_code=zip_code,
-                            kind=kind)
-        db.session.add(customer)
+
+        # 导入
+        insert_statement = ("INSERT INTO customers " +
+                            "VALUES('" + str(customer_id) + "', '" + str(address) + "', '" +
+                            str(state) + "', '" + str(city) + "', " + str(zip_code) + ", '" +
+                            str(kind) + "')")
+        db.session.execute(insert_statement)
         db.session.commit()
         db.session.remove()
         return "Account created successfully.",200
@@ -151,9 +150,6 @@ def home_customer(customer_id):
 @app.route('/register/salesperson/<salesperson_id>', methods=["POST"])
 def salesperson_register(salesperson_id):
     if request.method == "POST":
-        Salesperson = initDatabase.Salespersons
-        Store = initDatabase.Store
-
         name = request.args.get("name")
         if len(name) == 0:
             db.session.remove()
@@ -192,25 +188,22 @@ def salesperson_register(salesperson_id):
             return "Please input the zip code",512
 
         # 判断store是否已经存在
-        store_exist = Store.query.get(store_assigned)
+        query_statement = "SELECT * FROM store WHERE store_id = " + str(store_assigned)
+        store_existed = db.session.execute(query_statement)
 
-        if not store_exist:
+        if not store_existed:
             flash("Store doesn't exist")
             db.session.remove()
             return "Store doesn't exist",513
 
-        salesperson = Salesperson(salesperson_id=salesperson_id,
-                                  name=name,
-                                  email=email,
-                                  job_title=job_title,
-                                  store_assigned=store_assigned,
-                                  salary=salary,
-                                  state=state,
-                                  city=city,
-                                  address=address,
-                                  zip_code=zip_code)
+        # 导入salesperson
+        insert_statement = ("INSERT INTO salespersons " +
+                            "VALUES('" + str(salesperson_id) + "', '" + str(name) + "', '" +
+                            str(email) + "', '" + str(job_title) + "', " + str(store_assigned) + ", " +
+                            str(salary) + ", '" + str(state) + "', '" + str(city) + "', '" +
+                            str(address) + "', " + str(zip_code) + ")")
 
-        db.session.add(salesperson)
+        db.session.execute(insert_statement)
         db.session.commit()
         flash("salesperson create successfully")
         db.session.remove()
@@ -220,9 +213,6 @@ def salesperson_register(salesperson_id):
 @app.route('/register/store', methods=["POST"])
 def store_register():
     if request.method == "POST":
-        Store = initDatabase.Store
-        Region = initDatabase.Region
-
         store_id = request.args.get("store_id")
         if store_id == 0:
             db.session.remove()
@@ -253,29 +243,30 @@ def store_register():
             return "Please input the region",512
 
         # 判断region是否已经存在
-        region_exist = Region.query.get(region)
+        query_statement = "SELECT * FROM region WHERE region_id = " + str(region)
+        region_existed = db.session.execute(query_statement)
 
-        if not region_exist:
+        if not region_existed:
             flash("region doesn't exist")
             db.session.remove()
             return "region doesn't exist",513
 
         # 判断store_id是否重复
-        store_repeated = Store.query.get(store_id)
+        query_statement_2 = "SELECT * FROM store WHERE store_id = " + str(store_id)
+        store_existed = db.session.execute(query_statement_2)
 
-        if store_repeated:
+        if store_existed:
             flash("store id existed")
             db.session.remove()
             return "store id existed",514
 
-        store = Store(store_id=store_id,
-                      address=address,
-                      state=state,
-                      city=city,
-                      manager=manager,
-                      number_of_salesperson=number_of_salesperson,
-                      region=region)
-        db.session.add(store)
+        # 导入store
+        insert_statement = ("INSERT INTO store " +
+                            "VALUES(" + str(store_id) + ", '" + str(address) + "', '" +
+                            str(state) + "', '" + str(city) + "', '" + str(manager) + "', " +
+                            str(number_of_salesperson) + ", " + str(region) + ")")
+
+        db.session.execute(insert_statement)
         db.session.commit()
         flash("store create successfully")
         db.session.remove()
@@ -285,8 +276,6 @@ def store_register():
 @app.route('/register/region', methods=["POST"])
 def register_region():
     if request.method == "POST":
-        Region = initDatabase.Region
-
         region_id = request.args.get("region_id")
         if region_id == 0:
             db.session.remove()
@@ -301,17 +290,20 @@ def register_region():
             return "Please input region manager",512
 
         # 判断region_id是否重复
-        region_repeated = Region.query.get(region_id)
+        query_statement = "SELECT * FROM region WHERE region_id = " + str(region_id)
+        region_existed = db.session.execute(query_statement)
 
-        if region_repeated:
+        if region_existed:
             flash("region id existed")
             db.session.remove()
             return "region id existed",513
 
-        region = Region(region_id=region_id,
-                        region_name=region_name,
-                        region_manager=region_manager)
-        db.session.add(region)
+        # 导入region数据
+        insert_statement = ("INSERT INTO region " +
+                            "VALUES(" + str(region_id) + ", '" + str(region_name) + "', '" +
+                            str(region_manager) + "')")
+
+        db.session.execute(insert_statement)
         db.session.commit()
         flash("region create successfully")
         db.session.remove()
@@ -322,19 +314,22 @@ def register_region():
 def login():
     if request.method == "POST":
         # 获取表格
-        User = initDatabase.Users
         user_id_input = request.args.get("user_id")
         password_input = request.args.get("password")
 
         # 获取数据库中数据
-        user_id = User.query.get(user_id_input)
+        query_statement = "SELECT * FROM users WHERE user_id = '" + str(user_id_input) + "'"
+        user_existed = db.session.execute(query_statement)
 
-        if not user_id:
+        if not user_existed:
             flash("Account doesn't exist")
             db.session.remove()
             return "Account doesn't exist",512
         else:
-            password = User.query.get(user_id_input).password
+            # 查找密码
+            user_get = next(user_existed)
+            password = user_get.password
+
             if password_input == password:
                 flash('Account login successfully')
                 db.session.remove()
@@ -348,11 +343,6 @@ def login():
 @app.route('/transaction', methods=['POST','GET'])
 def transaction():
     if request.method == "POST":
-        # 获取表格
-        Transaction = initDatabase.Transactions
-        Customer = initDatabase.Customers
-        Salesperson = initDatabase.Salespersons
-
         # 获取数据
         date = request.args.get("date")
         if len(date) == 0:
@@ -372,8 +362,11 @@ def transaction():
             return "Please input customer id", 512
 
         # 判断用户和售货员是否存在
-        customer_existed = Customer.query.get(customer_id)
-        salesperson_existed = Salesperson.query.get(salesperson_id)
+        query_statement = "SELECT * FROM customers WHERE customer_id = '" + str(customer_id) + "'"
+        customer_existed = db.session.execute(query_statement)
+
+        query_statement_2 = "SELECT * FROM salespersons WHERE salesperson_id = '" + str(salesperson_id) + "'"
+        salesperson_existed = db.session.execute(query_statement_2)
 
         if not customer_existed:
             db.session.remove()
@@ -383,15 +376,18 @@ def transaction():
             return "The salesperson doesn't exist", 514
 
         # 生成订单id
-        count = Transaction.query.count()
+        count_statement = "SELECT COUNT(*) as total_count FROM transactions"
+        result = db.session.execute(count_statement)
+        count = next(result).total_count
+
         transaction_id = count + 1
 
         # 存入数据库
-        transaction = Transaction(transaction_id=transaction_id,
-                                  date=date_date,
-                                  salesperson_id=salesperson_id,
-                                  customer_id=customer_id)
-        db.session.add(transaction)
+        insert_statement = ("INSERT INTO transactions " +
+                            "VALUES(" + str(transaction_id) + ", '" + str(date) + "', '" +
+                            str(salesperson_id) + "', '" + str(customer_id) + "')")
+
+        db.session.execute(insert_statement)
         db.session.commit()
 
         transaction_id = str(transaction_id)
@@ -404,9 +400,6 @@ def transaction():
 def sub_transaction(transaction_id):
     if request.method == "POST":
         # 获取表格
-        Sub_Transaction = initDatabase.Sub_Transactions
-        Product = initDatabase.Products
-
         # 获取数据
         product_id = request.args.get("product_id")
         if product_id == 0:
@@ -416,38 +409,65 @@ def sub_transaction(transaction_id):
         quantity = request.args.get("quantity")
 
         # 生成子订单id
-        count = Sub_Transaction.query.count()
+        count_statement = "SELECT COUNT(*) as total_count FROM sub_transactions"
+        result = db.session.execute(count_statement)
+        count = next(result).total_count
         sub_transaction_id = count + 1
 
         # 存入数据
         length = len(product_id)
-        for i in range(length):
-            temp_product = product_id[i]
-            temp_quantity = quantity[i]
+        i = 0
+        j = 0
+        while True:
+            if product_id[i] == "]":
+                break
+
+            # 递归
+            temp_product = ""
+            temp_quantity = ""
+            i = i + 1
+            j = j + 1
+            while product_id[i] != "," and product_id[i] != "]":
+                temp_product += product_id[i]
+                i = i + 1
+
+            while quantity[j] != "," and quantity[j] != "]":
+                temp_quantity += quantity[j]
+                j = j + 1
+
+            # 转化为int类型
+
+            temp_product = int(temp_product)
+            temp_quantity = int(temp_quantity)
 
             if temp_quantity == 0:
                 db.session.remove()
                 return "Please input the quantity", 512
 
-            product_existed = Product.query.get(temp_product)
+            # 查找
+            query_statement = "SELECT * FROM products WHERE product_id = " + str(temp_product)
+            product_existed = db.session.execute(query_statement)
+
             if not product_existed:
                 db.session.remove()
                 return "product doesn't existed", 513
 
-            amount = product_existed.inventory_amount
+            # 查找2
+            amount = next(product_existed).inventory_amount
             if amount < temp_quantity:
                 db.session.remove()
                 return "There is no enough product", 514
 
-            sub_transaction = Sub_Transaction(sub_transaction_id=sub_transaction_id,
-                                              product_id=temp_product,
-                                              transaction_id=int(transaction_id),
-                                              quantity=temp_quantity)
-            db.session.add(sub_transaction)
+            # 导入
+            insert_statement = ("INSERT INTO sub_transactions " +
+                                "VALUES(" + str(sub_transaction_id) + ", " + str(temp_product) + ", " +
+                                str(transaction_id) + ", " + str(temp_quantity) + ")")
+
+            db.session.execute(insert_statement)
+            db.session.commit()
             # 还要再修改原本的product的存量
             sub_transaction_id = sub_transaction_id + 1
 
-        db.session.commit()
         db.session.remove()
         return "sub_transaction created correctly", 200
 
@@ -697,7 +717,7 @@ def query_transaction_customerID():
         # 根据customerID 查找订单
         query_statement = ("SELECT * FROM sub_transactions "
                            "JOIN transactions ON sub_transactions.transaction_id = transactions.transaction_id "
-                           "WHERE transactions.customer_id = " + str(customer_id))
+                           "WHERE transactions.customer_id = '" + str(customer_id)) + "'"
         try:
             all_transactions = db.engine.execute(query_statement)
         except Exception as e:
