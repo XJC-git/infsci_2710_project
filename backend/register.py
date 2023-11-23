@@ -833,7 +833,7 @@ def users_judge():
         user = db.engine.execute(query_statement)
 
         # 如果用户不存在，报错
-        if not user:
+        if user.rowcount == 0:
             db.session.remove()
             return "user doesn't existed!", 512
 
@@ -841,7 +841,7 @@ def users_judge():
         query_statement_2 = "SELECT * FROM customers WHERE customer_id = '" + str(user_id) + "'"
         user_type = db.engine.execute(query_statement_2)
         # 如果不存在，则用户是管理员
-        if not user_type:
+        if user_type.rowcount == 0:
             db.session.remove()
             return "salesperson", 200
         else:
