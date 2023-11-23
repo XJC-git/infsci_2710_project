@@ -843,10 +843,10 @@ def users_judge():
         # 如果不存在，则用户是管理员
         if not user_type:
             db.session.remove()
-            return "user is salesperson!", 200
+            return "salesperson", 200
         else:
             db.session.remove()
-            return "user is customer!", 200
+            return "customer", 200
 
 
 @app.teardown_appcontext
