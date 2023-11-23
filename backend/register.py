@@ -717,15 +717,32 @@ def query_transaction_customerID():
         # 根据customerID 查找订单
         query_statement = ("SELECT * FROM sub_transactions "
                            "JOIN transactions ON sub_transactions.transaction_id = transactions.transaction_id "
-                           "WHERE transactions.customer_id = '" + str(customer_id)) + "'"
+                           "WHERE transactions.customer_id = '" + str(customer_id) + "' " +
+                           "ORDER BY transaction_id DESC")
         try:
             all_transactions = db.engine.execute(query_statement)
         except Exception as e:
             db.session.remove()
             return f"false: {str(e)}", 513
 
+        final_result = []
+        transaction_result = {}
         transaction_dicts = []
+        all_transaction_id = -1
         for temp in all_transactions:
+            temp_id = temp.transaction_id
+            if temp_id != all_transaction_id:
+                # 更新transaction_id
+                # 如果更新了，则说明上一阶段存储完毕，需要存新的transaction_id作为头
+                if len(transaction_result) != 0:
+                    transaction_result.update({'sub_transactions':transaction_dicts})
+                    final_result.append(transaction_result)
+                # 先清空再更新
+                transaction_result = {}
+                transaction_result.update({'transaction_id':temp.transaction_id})
+                # 再清空transaction_dicts
+                transaction_dicts = []
+
             transaction_dict = {'transaction_id': temp.transaction_id, 'date': str(temp.date),
                                 'salesperson_id': temp.salesperson_id,
                                 'customer_id': temp.customer_id,
@@ -734,8 +751,12 @@ def query_transaction_customerID():
                                 'quantity': temp.quantity}
             transaction_dicts.append(transaction_dict)
 
+        # 跳出循环后，需要再载入一次最后的结果
+        transaction_result.update({'sub_transactions':transaction_dicts})
+        final_result.append(transaction_result)
+
         db.session.remove()
-        return jsonify(transaction_dicts=transaction_dicts), 200
+        return jsonify(transaction_dicts=final_result), 200
 
 
 @app.route('/query/product', methods=['GET'])
