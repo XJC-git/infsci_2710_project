@@ -53,6 +53,19 @@ export const useCart = create(
                     }))
                 }
             },
+            removeItem: (productID) => {
+                let temp_amounts = get().amounts.map((x) => x)
+                let temp_items = get().items.map((x) => x)
+                if (temp_items.includes(productID)){
+                    let index = temp_items.indexOf(productID)
+                    temp_amounts.splice(index,1)
+                    temp_items.splice(index,1)
+                    set(state=>({
+                        items:temp_items,
+                        amounts:temp_amounts
+                    }))
+                }
+            },
         }),
         {
             name: 'cart-storage', // name of the item in the storage (must be unique)
