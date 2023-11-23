@@ -618,7 +618,7 @@ def query_productID():
         for temp in product_result:
             product_dict = {'product_id': temp.product_id, 'name': temp.name,
                             'category': temp.category, 'price': temp.price,
-                            'inventory_amount': temp.inventory_amount}
+                            'inventory_amount': temp.inventory_amount, 'avatar':temp.avatar}
             product_dicts.append(product_dict)
 
         db.session.remove()
