@@ -31,6 +31,7 @@ def register():
         password_1 = request.args.get("password_1")
 
         # 查询
+        
         existed_user = User.query.get(user_id)
 
         if len(user_id) == 0:
@@ -622,7 +623,7 @@ def query_productID():
             product_dicts.append(product_dict)
 
         db.session.remove()
-        return json.dumps(product_dicts), 200
+        return json.dumps(product_dicts[0]), 200
 
 
 # 判断当前用户是customer还是salesperson
