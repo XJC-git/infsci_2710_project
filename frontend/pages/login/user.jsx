@@ -11,7 +11,7 @@ export default function User(){
     const [showNotification,setShowNotification] = useState(false)
     const [typeNotification,setTypeNotification] = useState('success')
     const [contextNotification,setContextNotification] = useState('EMPTY MSG')
-    const setUserID = useUserID((state)=>state.setUserID)
+    const {setUserID,setUserType,setUserInfo} = useUserID()
     function handleLogin(){
         const username = document.querySelector("#username").value;
         const password = document.querySelector("#password").value;
@@ -21,6 +21,28 @@ export default function User(){
             'password':password
         }}).then((res) => {
             setUserID(username)
+            axios_instance.post('/users/judge',null,{params:{
+                    user_id:username
+                }}
+            ).then((res)=>{
+                if(res.data==='customer'){
+                    setUserType('customer')
+                    axios_instance.post('/query/customerID',null,{params:{
+                            customer_id:username
+                        }}
+                    ).then((res)=>{
+                        setUserInfo(res.data)
+                    })
+                }else{
+                    setUserType('salesperson')
+                    axios_instance.post('/query/salespersonID',null,{params:{
+                            salesperson_id:username
+                        }}
+                    ).then((res)=>{
+                        setUserInfo(res.data)
+                    })
+                }
+            })
             setTypeNotification('success')
             setContextNotification(res.data)
             setShowNotification(true)

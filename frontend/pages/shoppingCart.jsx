@@ -16,7 +16,7 @@ export default function shoppingCart(){
     const amounts = useFromStore(useCart,state=>state.amounts)
     const [productInfo,setProductInfo] = useState({})
     const [isLoading, setIsLoading] = useState(true)
-    const {addItem,reduceItem,removeItem} = useCart()
+    const {addItem,reduceItem,removeItem,clearCart} = useCart()
     const [total,setTotal] = useState(0)
     const userID = useFromStore(useUserID,state => state.userID)
     const [showSubmitPopup, setShowSubmitPopup] = useState(false)
@@ -24,8 +24,13 @@ export default function shoppingCart(){
     const [showNotification,setShowNotification] = useState(false)
     const [typeNotification,setTypeNotification] = useState('success')
     const [contextNotification,setContextNotification] = useState('EMPTY MSG')
+    const [mainTransactionID, setMainTransactionID] = useState(-1)
     useEffect(() => {
         let loaded = 0;
+        if(items&&items.length===0){
+            setIsLoading(false)
+            return
+        }
         items?.map((item,index)=>(
             axios_instance.post('/query/productID',null,{params:{
                     product_id:item
@@ -70,26 +75,16 @@ export default function shoppingCart(){
 
         const formattedToday = yyyy+'-'+mm+'-'+dd;
         const salesperson = document.querySelector("#salespersonID").value;
-        axios_instance.post("/transaction",null,{params:{
-                date:formattedToday,
-                salesperson_id:salesperson,
-                customer_id:userID
-            }}
-        ).then((res) => {
-            let transactionID = res.data['transaction_id']
-            axios_instance.post("/sub_transaction/"+transactionID,null,{params:{
-                    product_id:'['+items.toString()+']',
-                    quantity:'['+amounts.toString()+']'
+        if(mainTransactionID===-1){
+            axios_instance.post("/transaction",null,{params:{
+                    date:formattedToday,
+                    salesperson_id:salesperson,
+                    customer_id:userID
                 }}
             ).then((res) => {
-                setIsSubmitting(false)
-                setTypeNotification('success')
-                setContextNotification(res.data)
-                setShowNotification(true)
-                setTimeout(function() {
-                    setShowNotification(false)
-                    router.push("/home")
-                }, 2000);
+                let transactionID = res.data['transaction_id']
+                setMainTransactionID(transactionID)
+                submitSubTransaction(transactionID)
             }).catch((error)=>{
                 setIsSubmitting(false)
                 if(error.response){
@@ -110,6 +105,27 @@ export default function shoppingCart(){
                 }
 
             });
+        }
+        else{
+            submitSubTransaction(mainTransactionID)
+        }
+
+    }
+    const submitSubTransaction = (transactionID)=>{
+        axios_instance.post("/sub_transaction/"+transactionID,null,{params:{
+                product_id:'['+items.toString()+']',
+                quantity:'['+amounts.toString()+']'
+            }}
+        ).then((res) => {
+            setIsSubmitting(false)
+            setTypeNotification('success')
+            setContextNotification(res.data)
+            setShowNotification(true)
+            setTimeout(function() {
+                setShowNotification(false)
+                clearCart()
+                router.push("/home")
+            }, 2000);
         }).catch((error)=>{
             setIsSubmitting(false)
             if(error.response){
@@ -130,8 +146,6 @@ export default function shoppingCart(){
             }
 
         });
-
-
     }
     return(
         <>
@@ -179,6 +193,8 @@ export default function shoppingCart(){
                             ))}
                         </div>
                         :
+                        items?.length==0?
+                            <div className="flex flex-row h-screen items-center justify-center text-4xl font-bold w-full text-center bg-gradient-to-br from-fuchsia-600 to-sky-600 bg-clip-text text-transparent tracking-wide leading-tight">Shopping Cart is empty, go shopping</div>:
                         <>
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 ml-4 mr-4 ">
                                 {items?.map((item,index)=> {
@@ -226,19 +242,21 @@ export default function shoppingCart(){
                                 })}
                             </div>
 
+                            <div className="flex flex-row justify-end ml-4 mr-4 items-center">
+                                <div className="flex font-bold text-xl rounded-lg mr-4">
+                                    Total:
+                                </div>
+                                <div className="flex font-bold text-xl rounded-lg mr-4">
+                                    {total}
+                                </div>
+                                <button onClick={handleSubmit} className="flex outline-none bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-800">Submit Order</button>
+                            </div>
+
                         </>
                 }
 
 
-                <div className="flex flex-row justify-end ml-4 mr-4 items-center">
-                    <div className="flex font-bold text-xl rounded-lg mr-4">
-                        Total:
-                    </div>
-                    <div className="flex font-bold text-xl rounded-lg mr-4">
-                        {total}
-                    </div>
-                    <button onClick={handleSubmit} className="flex outline-none bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-800">Submit Order</button>
-                </div>
+
 
 
                 {/*Submit Popup*/}
@@ -252,7 +270,7 @@ export default function shoppingCart(){
                     leave="transition-all duration-300"
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
-                    className="absolute inset-0 min-h-screen w-full h-full bg-gray-800/20 backdrop-blur-sm flex items-center justify-center">
+                    className="absolute z-40 inset-0 min-h-screen w-full h-full bg-gray-800/20 backdrop-blur-sm flex items-center justify-center">
                     <div className="flex w-3/4 flex-col gap-y-2 px-4 rounded-lg bg-white pt-4 pb-4 shadow">
                         <div className="flex items-center w-full justify-between">
                             <div className="flex text-lg font-bold text-left">One more step...</div>

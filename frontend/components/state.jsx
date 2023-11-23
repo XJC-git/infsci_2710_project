@@ -2,10 +2,21 @@ import { create } from 'zustand'
 import {createJSONStorage, persist} from "zustand/middleware";
 
 export const useUserID = create(
-    persist((set) => ({
+    persist((set,get) => ({
         userID: 0,
+        userType:'',
+        userInfo:{},
         setUserID: (userID) => set((state)=>({userID: userID})),
+        setUserType: (userType) => set((state)=>({userType:userType})),
+        setUserInfo: (userInfo) => set((state)=>({userInfo:userInfo})),
         removeUserID: () => set({ userID: 0 }),
+        removeUserType: () => set({ userType:'' }),
+        removeUserInfo: () => set({ userInfo:{} }),
+        removeAll: ()=> {
+            get().removeUserID();
+            get().removeUserType();
+            get().removeUserInfo();
+        }
     }),
         {
             name: 'user-storage', // name of the item in the storage (must be unique)
@@ -66,6 +77,10 @@ export const useCart = create(
                     }))
                 }
             },
+            clearCart:()=>set((state)=>(
+                {items: [],
+                amounts: []})
+            )
         }),
         {
             name: 'cart-storage', // name of the item in the storage (must be unique)
