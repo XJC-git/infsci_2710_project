@@ -559,45 +559,122 @@ def delete_sub_transaction():
 # query function：
 # -----------------------------------------------
 # -----------------------------------------------
-@app.route('/query/customer', methods=['POST'])
-def query_customer():
-    # 从前端获取customer_id
-    customer_id = request.args.get("customer_id")
+@app.route('/query/salesperson', methods=['GET'])
+def query_salesperson():
+    if request.method == "GET":
+        # 查询
+        query_statement = "SELECT * FROM salespersons"
+        all_salesperson = db.session.execute(query_statement)
 
-    # 查看用户是否存在
-    query_statement = "SELECT * FROM customers WHERE customer_id = '" + str(customer_id) + "'"
-    customer_existed = db.session.execute(query_statement)
-    if not customer_existed:
-        return "customer doesn't existed", 512
+        salesperson_dicts = []
+        for temp in all_salesperson:
+            salesperson_dict = {'salesperson_id':temp.salesperson_id, 'name':temp.name,
+                                'email':temp.email, 'job_title':temp.job_title,
+                                'store_assigned':temp.store_assigned, 'salary':temp.salary,
+                                'state':temp.state, 'city':temp.city,
+                                'address':temp.address, 'zip_code':temp.zip_code}
+            salesperson_dicts.append(salesperson_dict)
 
-    temp_customer = next(customer_existed)
-    # 判断用户类型
-    type = temp_customer.kind
-    if type == "business":
-        # 查找表
-        query_statement_2 = "SELECT * FROM business_customers WHERE customer_id = '" + str(customer_id) + "'"
-        result = db.session.execute(query_statement_2)
-        temp_business = next(result)
-        all_customer_information = {'customer_id':customer_id, 'address':temp_customer.address,
-                                    'state':temp_customer.state, 'city':temp_customer.city,
-                                    'zip_code':temp_customer.zip_code, 'kind':temp_customer.kind,
-                                    'comapny_name':temp_business.company_name,
-                                    'business_category':temp_business.business_category,
-                                    'company_income':temp_business.company_income}
-        return json.dumps(all_customer_information), 200
-    elif type == "home":
-        # 查找表
-        query_statement_2 = "SELECT * FROM home_customers WHERE customer_id = '" + str(customer_id) + "'"
-        result = db.session.execute(query_statement_2)
-        temp_home = next(result)
-        all_customer_information = {'customer_id':customer_id, 'address':temp_customer.address,
-                                    'state':temp_customer.state, 'city':temp_customer.city,
-                                    'zip_code':temp_customer.zip_code, 'kind':temp_customer.kind,
-                                    'marriage_status':temp_home.marriage_status,
-                                    'gender':temp_home.gender, 'age':temp_home.age}
-        return json.dumps(all_customer_information), 200
-    else:
-        return "type is incorrect", 513
+        return json.dumps(salesperson_dicts), 200
+
+
+@app.route('/query/salespersonID', methods=['POST'])
+def query_salesperson_id():
+    if request.method == "POST":
+        # 从前端获取id
+        salesperson_id = request.args.get("salesperson_id")
+        # 查询
+        query_statement = ("SELECT * FROM salespersons" +
+                           "WHERE salesperson_id = '" + str(salesperson_id) + "'")
+        result = db.session.execute(query_statement)
+        # 检查是否存在
+        if not result:
+            return "salesperson doesn't existed", 512
+        salesperson_get = next(result)
+        salesperson_dict = {'salesperson_id':salesperson_get.salesperson_id, 'name':salesperson_get.name,
+                                'email':salesperson_get.email, 'job_title':salesperson_get.job_title,
+                                'store_assigned':salesperson_get.store_assigned, 'salary':salesperson_get.salary,
+                                'state':salesperson_get.state, 'city':salesperson_get.city,
+                                'address':salesperson_get.address, 'zip_code':salesperson_get.zip_code}
+        return json.dumps(salesperson_dict), 200
+
+
+@app.route('/query/storeID', methods=['POST'])
+def query_store_id():
+    if request.method == "POST":
+        # 从前端获取id
+        store_id = request.args.get("store_id")
+        # 查询
+        query_statement = ("SELECT * FROM store" +
+                           "WHERE store_id = " + str(store_id))
+        result = db.session.execute(query_statement)
+        # 判断是否存在
+        if not result:
+            return "store doesn't existed", 512
+        store_get = next(result)
+        store_dict = {'store_id':store_get.store_id, 'address':store_get.address,
+                      'state':store_get.state, 'city':store_get.city, 'manager':store_get.manager,
+                      'number_of_salesperson':store_get.number_of_salesperson, 'region':store_get.region}
+        return json.dumps(store_dict), 200
+
+
+@app.route('/query/regionID', methods=['POST'])
+def query_region_id():
+    # 从前端获取region_id
+    region_id = request.args.get("region_id")
+
+    # 查看是否存在
+    query_statement = ("SELECT * FROM region" +
+                       "WHERE region_id = " + str(region_id))
+    result = db.session.execute(query_statement)
+    if not result:
+        return "region doesn't existed", 512
+    region_get = next(result)
+    region_dict = {'region_id':region_get.region_id, 'region_name':region_get.region_name,
+                   'region_manager':region_get.region_manager}
+    return json.dumps(region_dict), 200
+
+
+@app.route('/query/customerID', methods=['POST'])
+def query_customer_id():
+    if request.method == "POST":
+        # 从前端获取customer_id
+        customer_id = request.args.get("customer_id")
+
+        # 查看用户是否存在
+        query_statement = "SELECT * FROM customers WHERE customer_id = '" + str(customer_id) + "'"
+        customer_existed = db.session.execute(query_statement)
+        if not customer_existed:
+            return "customer doesn't existed", 512
+
+        temp_customer = next(customer_existed)
+        # 判断用户类型
+        type = temp_customer.kind
+        if type == "business":
+            # 查找表
+            query_statement_2 = "SELECT * FROM business_customers WHERE customer_id = '" + str(customer_id) + "'"
+            result = db.session.execute(query_statement_2)
+            temp_business = next(result)
+            all_customer_information = {'customer_id': customer_id, 'address': temp_customer.address,
+                                        'state': temp_customer.state, 'city': temp_customer.city,
+                                        'zip_code': temp_customer.zip_code, 'kind': temp_customer.kind,
+                                        'comapny_name': temp_business.company_name,
+                                        'business_category': temp_business.business_category,
+                                        'company_income': temp_business.company_income}
+            return json.dumps(all_customer_information), 200
+        elif type == "home":
+            # 查找表
+            query_statement_2 = "SELECT * FROM home_customers WHERE customer_id = '" + str(customer_id) + "'"
+            result = db.session.execute(query_statement_2)
+            temp_home = next(result)
+            all_customer_information = {'customer_id': customer_id, 'address': temp_customer.address,
+                                        'state': temp_customer.state, 'city': temp_customer.city,
+                                        'zip_code': temp_customer.zip_code, 'kind': temp_customer.kind,
+                                        'marriage_status': temp_home.marriage_status,
+                                        'gender': temp_home.gender, 'age': temp_home.age}
+            return json.dumps(all_customer_information), 200
+        else:
+            return "type is incorrect", 513
 
 
 @app.route('/query/transaction/customerID', methods=['POST'])
