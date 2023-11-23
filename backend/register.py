@@ -321,7 +321,7 @@ def login():
         query_statement = "SELECT * FROM users WHERE user_id = '" + str(user_id_input) + "'"
         user_existed = db.session.execute(query_statement)
 
-        if not user_existed:
+        if user_existed.rowcount == 0:
             flash("Account doesn't exist")
             db.session.remove()
             return "Account doesn't exist",512
@@ -448,7 +448,7 @@ def sub_transaction(transaction_id):
             query_statement = "SELECT * FROM products WHERE product_id = " + str(temp_product)
             product_existed = db.session.execute(query_statement)
 
-            if not product_existed:
+            if product_existed.rowcount == 0:
                 db.session.remove()
                 return "product doesn't existed", 513
 
@@ -611,14 +611,14 @@ def query_salesperson_id():
                            "WHERE salesperson_id = '" + str(salesperson_id) + "'")
         result = db.session.execute(query_statement)
         # 检查是否存在
-        if not result:
+        if result.rowcount == 0:
             return "salesperson doesn't existed", 512
         salesperson_get = next(result)
         salesperson_dict = {'salesperson_id':salesperson_get.salesperson_id, 'name':salesperson_get.name,
-                                'email':salesperson_get.email, 'job_title':salesperson_get.job_title,
-                                'store_assigned':salesperson_get.store_assigned, 'salary':salesperson_get.salary,
-                                'state':salesperson_get.state, 'city':salesperson_get.city,
-                                'address':salesperson_get.address, 'zip_code':salesperson_get.zip_code}
+                            'email':salesperson_get.email, 'job_title':salesperson_get.job_title,
+                            'store_assigned':salesperson_get.store_assigned, 'salary':salesperson_get.salary,
+                            'state':salesperson_get.state, 'city':salesperson_get.city,
+                            'address':salesperson_get.address, 'zip_code':salesperson_get.zip_code}
         return json.dumps(salesperson_dict), 200
 
 
@@ -632,7 +632,7 @@ def query_store_id():
                            "WHERE store_id = " + str(store_id))
         result = db.session.execute(query_statement)
         # 判断是否存在
-        if not result:
+        if result.rowcount == 0:
             return "store doesn't existed", 512
         store_get = next(result)
         store_dict = {'store_id':store_get.store_id, 'address':store_get.address,
@@ -650,7 +650,7 @@ def query_region_id():
     query_statement = ("SELECT * FROM region " +
                        "WHERE region_id = " + str(region_id))
     result = db.session.execute(query_statement)
-    if not result:
+    if result.rowcount == 0:
         return "region doesn't existed", 512
     region_get = next(result)
     region_dict = {'region_id':region_get.region_id, 'region_name':region_get.region_name,
@@ -667,13 +667,13 @@ def query_customer_id():
         # 查看用户是否存在
         query_statement = "SELECT * FROM customers WHERE customer_id = '" + str(customer_id) + "'"
         customer_existed = db.session.execute(query_statement)
-        if not customer_existed:
+        if customer_existed.rowcount == 0:
             return "customer doesn't existed", 512
 
         temp_customer = next(customer_existed)
         # 判断用户类型
-        type = temp_customer.kind
-        if type == "business":
+        type_customer = temp_customer.kind
+        if type_customer == "business":
             # 查找表
             query_statement_2 = "SELECT * FROM business_customers WHERE customer_id = '" + str(customer_id) + "'"
             result = db.session.execute(query_statement_2)
@@ -681,11 +681,11 @@ def query_customer_id():
             all_customer_information = {'customer_id': customer_id, 'address': temp_customer.address,
                                         'state': temp_customer.state, 'city': temp_customer.city,
                                         'zip_code': temp_customer.zip_code, 'kind': temp_customer.kind,
-                                        'comapny_name': temp_business.company_name,
+                                        'company_name': temp_business.company_name,
                                         'business_category': temp_business.business_category,
                                         'company_income': temp_business.company_income}
             return json.dumps(all_customer_information), 200
-        elif type == "home":
+        elif type_customer == "home":
             # 查找表
             query_statement_2 = "SELECT * FROM home_customers WHERE customer_id = '" + str(customer_id) + "'"
             result = db.session.execute(query_statement_2)
@@ -726,7 +726,7 @@ def query_transaction_customerID():
 
         transaction_dicts = []
         for temp in all_transactions:
-            transaction_dict = {'transaction_id': temp.transaction_id, 'date': temp.date,
+            transaction_dict = {'transaction_id': temp.transaction_id, 'date': str(temp.date),
                                 'salesperson_id': temp.salesperson_id,
                                 'customer_id': temp.customer_id,
                                 'sub_transaction_id': temp.sub_transaction_id,
@@ -735,7 +735,7 @@ def query_transaction_customerID():
             transaction_dicts.append(transaction_dict)
 
         db.session.remove()
-        return json.dumps(transaction_dicts), 200
+        return jsonify(transaction_dicts=transaction_dicts), 200
 
 
 @app.route('/query/product', methods=['GET'])
@@ -792,7 +792,7 @@ def query_productID():
         # 根据id查找
         query_statement = "SELECT * FROM products WHERE product_id = " + str(product_id)
         product_result = db.session.execute(query_statement)
-        if not product_result:
+        if product_result.rowcount == 0:
             db.session.remove()
             return "Product doesn't existed", 512
 
