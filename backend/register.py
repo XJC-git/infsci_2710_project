@@ -24,15 +24,13 @@ SQLALCHEMY_POOL_TIMEOUT = 300
 def register():
     if request.method == "POST":
         # 获取表格
-        User = initDatabase.Users
-
         user_id = request.args.get("user_id")
         password = request.args.get("password")
         password_1 = request.args.get("password_1")
 
         # 查询
-        
-        existed_user = User.query.get(user_id)
+        query_statement = "SELECT * FROM user WHERE user_id = '" + str(user_id) + "'"
+        existed_user = db.session.execute(query_statement)
 
         if len(user_id) == 0:
             flash('Please input the username')
@@ -51,8 +49,8 @@ def register():
         elif password_1 == password:
             flash('Account created successfully.')
             # 存入数据
-            user = User(user_id=user_id, password=password)
-            db.session.add(user)
+            insert_query = "INSERT INTO user VALUES('" + str(user_id) + "', '" + str(password) + "')"
+            db.session.execute(insert_query)
             db.session.commit()
             db.session.remove()
             return "Account created successfully.", 200
@@ -60,9 +58,6 @@ def register():
             flash('The passwords entered twice are inconsistent.')
             db.session.remove()
             return "The passwords entered twice are inconsistent.", 515
-
-
-        #return render_template("register.html")
 
 
 @app.route('/register/customer/<customer_id>', methods=['GET','POST'])
@@ -102,6 +97,52 @@ def customer_register(customer_id):
         db.session.commit()
         db.session.remove()
         return "Account created successfully.",200
+
+
+@app.route('/register/customer/<customer_id>/business', methods=['POST'])
+def business_register(customer_id):
+    if request.method == "POST":
+        company_name = request.args.get("company_name")
+        # 如果为空，报错
+        if len(company_name) == 0:
+            return "Please input the company name", 512
+        business_category = request.args.get("business_category")
+        if len(business_category) == 0:
+            return "Please input the business category", 512
+        company_income = request.args.get("company_income")
+        if company_income == 0:
+            return "Please input the company income", 512
+
+        # 导入数据库
+        insert_query = ("INSERT INTO business_customers " +
+                        "VALUES('" + str(customer_id) + "', '"
+                        + str(company_name) + "', '" +
+                        str(business_category) + "', " +
+                        str(company_income) + ")")
+
+        db.session.execute(insert_query)
+        db.session.commit()
+        return "business customer register correctly", 200
+
+
+@app.route('/register/customer/<customer_id>/home', methods=['POST'])
+def home_customer(customer_id):
+    if request.method == "POST":
+        marriage_status = request.args.get("marriage_status")
+        gender = request.args.get("gender")
+        if len(gender) == 0:
+            return "Please input the gender", 512
+        age = request.args.get("age")
+        if age == 0:
+            return "Please input the age", 512
+
+        # 导入数据库
+        insert_query = ("INSERT INTO home_customers " +
+                        "VALUES('" + str(customer_id) + "', " + str(marriage_status) + ", '" +
+                        str(gender) + "', " + str(age) + ")")
+        db.session.execute(insert_query)
+        db.session.commit()
+        return "home customer register correctly", 200
 
 
 @app.route('/register/salesperson/<salesperson_id>', methods=["POST"])
@@ -518,6 +559,47 @@ def delete_sub_transaction():
 # query function：
 # -----------------------------------------------
 # -----------------------------------------------
+@app.route('/query/customer', methods=['POST'])
+def query_customer():
+    # 从前端获取customer_id
+    customer_id = request.args.get("customer_id")
+
+    # 查看用户是否存在
+    query_statement = "SELECT * FROM customers WHERE customer_id = '" + str(customer_id) + "'"
+    customer_existed = db.session.execute(query_statement)
+    if not customer_existed:
+        return "customer doesn't existed", 512
+
+    temp_customer = next(customer_existed)
+    # 判断用户类型
+    type = temp_customer.kind
+    if type == "business":
+        # 查找表
+        query_statement_2 = "SELECT * FROM business_customers WHERE customer_id = '" + str(customer_id) + "'"
+        result = db.session.execute(query_statement_2)
+        temp_business = next(result)
+        all_customer_information = {'customer_id':customer_id, 'address':temp_customer.address,
+                                    'state':temp_customer.state, 'city':temp_customer.city,
+                                    'zip_code':temp_customer.zip_code, 'kind':temp_customer.kind,
+                                    'comapny_name':temp_business.company_name,
+                                    'business_category':temp_business.business_category,
+                                    'company_income':temp_business.company_income}
+        return json.dumps(all_customer_information), 200
+    elif type == "home":
+        # 查找表
+        query_statement_2 = "SELECT * FROM home_customers WHERE customer_id = '" + str(customer_id) + "'"
+        result = db.session.execute(query_statement_2)
+        temp_home = next(result)
+        all_customer_information = {'customer_id':customer_id, 'address':temp_customer.address,
+                                    'state':temp_customer.state, 'city':temp_customer.city,
+                                    'zip_code':temp_customer.zip_code, 'kind':temp_customer.kind,
+                                    'marriage_status':temp_home.marriage_status,
+                                    'gender':temp_home.gender, 'age':temp_home.age}
+        return json.dumps(all_customer_information), 200
+    else:
+        return "type is incorrect", 513
+
+
 @app.route('/query/transaction/customerID', methods=['POST'])
 def query_transaction_customerID():
     if request.method == "POST":
@@ -615,15 +697,13 @@ def query_productID():
             return "Product doesn't existed", 512
 
         # 将查询结果封装成字典
-        product_dicts = []
-        for temp in product_result:
-            product_dict = {'product_id': temp.product_id, 'name': temp.name,
-                            'category': temp.category, 'price': temp.price,
-                            'inventory_amount': temp.inventory_amount, 'avatar':temp.avatar}
-            product_dicts.append(product_dict)
+        temp = next(product_result)
+        product_dict = {'product_id': temp.product_id, 'name': temp.name,
+                        'category': temp.category, 'price': temp.price,
+                        'inventory_amount': temp.inventory_amount, 'avatar': temp.avatar}
 
         db.session.remove()
-        return json.dumps(product_dicts[0]), 200
+        return json.dumps(product_dict), 200
 
 
 # 判断当前用户是customer还是salesperson
