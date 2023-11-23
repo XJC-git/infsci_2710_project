@@ -753,8 +753,7 @@ def query_transaction_customerID():
         #     transaction_dicts.append(transaction_dict)
 
         final_result = []
-        while len(all_transactions) > 0:
-            current_transaction = all_transactions[0]
+        for current_transaction in all_transactions:
             main_transaction_id = current_transaction.transaction_id
             has_tr = False
             for tr in final_result:
@@ -777,7 +776,6 @@ def query_transaction_customerID():
                 if tr['transaction_id'] == main_transaction_id:
                     tr['sub_transactions'].append(sub_transaction_dict)
 
-            all_transactions.remove(current_transaction)
         # 跳出循环后，需要再载入一次最后的结果
         # transaction_result.update({'sub_transactions': transaction_dicts})
         # final_result.append(transaction_result)
