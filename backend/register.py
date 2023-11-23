@@ -726,32 +726,6 @@ def query_transaction_customerID():
             db.session.remove()
             return f"false: {str(e)}", 513
 
-        # final_result = []
-        # transaction_result = {}
-        # transaction_dicts = []
-        # all_transaction_id = -1
-        # for temp in all_transactions:
-        #     temp_id = temp.transaction_id
-        #     if temp_id != all_transaction_id:
-        #         # 更新transaction_id
-        #         # 如果更新了，则说明上一阶段存储完毕，需要存新的transaction_id作为头
-        #         if len(transaction_result) != 0:
-        #             transaction_result.update({'sub_transactions': transaction_dicts})
-        #             final_result.append(transaction_result)
-        #         # 先清空再更新
-        #         transaction_result = {}
-        #         transaction_result.update({'transaction_id': temp.transaction_id})
-        #         # 再清空transaction_dicts
-        #         transaction_dicts = []
-        #
-        #     transaction_dict = {'transaction_id': temp.transaction_id, 'date': str(temp.date),
-        #                         'salesperson_id': temp.salesperson_id,
-        #                         'customer_id': temp.customer_id,
-        #                         'sub_transaction_id': temp.sub_transaction_id,
-        #                         'product_id': temp.product_id,
-        #                         'quantity': temp.quantity}
-        #     transaction_dicts.append(transaction_dict)
-
         final_result = []
         for current_transaction in all_transactions:
             main_transaction_id = current_transaction.transaction_id
@@ -765,6 +739,7 @@ def query_transaction_customerID():
                 temp_dicts = {'transaction_id': main_transaction_id,
                               'salesperson_id': current_transaction.salesperson_id,
                               'customer_id': current_transaction.customer_id,
+                              'date': current_transaction.date,
                               'sub_transactions': []}
                 final_result.append(temp_dicts)
 
@@ -776,12 +751,8 @@ def query_transaction_customerID():
                 if tr['transaction_id'] == main_transaction_id:
                     tr['sub_transactions'].append(sub_transaction_dict)
 
-        # 跳出循环后，需要再载入一次最后的结果
-        # transaction_result.update({'sub_transactions': transaction_dicts})
-        # final_result.append(transaction_result)
-
         db.session.remove()
-        return jsonify(transaction_dicts=final_result), 200
+        return jsonify(final_result), 200
 
 
 @app.route('/query/product', methods=['GET'])
