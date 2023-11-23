@@ -27,6 +27,7 @@ def register():
         user_id = request.args.get("user_id")
         password = request.args.get("password")
         password_1 = request.args.get("password_1")
+        user_type = request.args.get("user_type")
 
         # 查询
         query_statement = "SELECT * FROM user WHERE user_id = '" + str(user_id) + "'"
@@ -49,7 +50,9 @@ def register():
         elif password_1 == password:
             flash('Account created successfully.')
             # 存入数据
-            insert_query = "INSERT INTO user VALUES('" + str(user_id) + "', '" + str(password) + "')"
+            insert_query = ("INSERT INTO user " +
+                            "VALUES('" + str(user_id) + "', '" + str(password) + "', '" +
+                            str(user_type) + "')")
             db.session.execute(insert_query)
             db.session.commit()
             db.session.remove()
