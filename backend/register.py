@@ -319,7 +319,7 @@ def login():
         password_input = request.args.get("password")
 
         # 获取数据库中数据
-        query_statement = "SELECT * FROM users WHERE user_id = '" + str(user_id_input) + "'"
+        query_statement = "SELECT * FROM user WHERE user_id = '" + str(user_id_input) + "'"
         user_existed = db.session.execute(query_statement)
 
         if user_existed.rowcount == 0:
