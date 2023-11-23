@@ -488,7 +488,7 @@ def product():
         if len(category) == 0:
             flash("Please input the category")
             db.session.remove()
-            return "Please input the catetory", 512
+            return "Please input the category", 512
         price = request.args.get("price")
         if price == 0:
             flash("Please input the price")
@@ -607,7 +607,7 @@ def query_salesperson_id():
         # 从前端获取id
         salesperson_id = request.args.get("salesperson_id")
         # 查询
-        query_statement = ("SELECT * FROM salespersons" +
+        query_statement = ("SELECT * FROM salespersons " +
                            "WHERE salesperson_id = '" + str(salesperson_id) + "'")
         result = db.session.execute(query_statement)
         # 检查是否存在
@@ -628,7 +628,7 @@ def query_store_id():
         # 从前端获取id
         store_id = request.args.get("store_id")
         # 查询
-        query_statement = ("SELECT * FROM store" +
+        query_statement = ("SELECT * FROM store " +
                            "WHERE store_id = " + str(store_id))
         result = db.session.execute(query_statement)
         # 判断是否存在
@@ -647,7 +647,7 @@ def query_region_id():
     region_id = request.args.get("region_id")
 
     # 查看是否存在
-    query_statement = ("SELECT * FROM region" +
+    query_statement = ("SELECT * FROM region " +
                        "WHERE region_id = " + str(region_id))
     result = db.session.execute(query_statement)
     if not result:
