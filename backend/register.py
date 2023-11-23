@@ -718,7 +718,7 @@ def query_transaction_customerID():
         query_statement = ("SELECT * FROM sub_transactions "
                            "JOIN transactions ON sub_transactions.transaction_id = transactions.transaction_id "
                            "WHERE transactions.customer_id = '" + str(customer_id) + "' " +
-                           "ORDER BY transaction_id DESC")
+                           "ORDER BY sub_transactions.transaction_id DESC")
         try:
             all_transactions = db.engine.execute(query_statement)
         except Exception as e:
