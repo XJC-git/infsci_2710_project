@@ -11,18 +11,16 @@ from datetime import datetime
 import json
 
 app = Flask(__name__)
-app.config[
-    'SQLALCHEMY_DATABASE_URI'] = "mysql://" + dbInfo.user_name + ":" + dbInfo.password + "@" + dbInfo.host + "/" + dbInfo.db_name
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://" + dbInfo.user_name + ":" + dbInfo.password + "@" + dbInfo.host + "/" + dbInfo.db_name
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-app.secret_key = 'kdjklfjkd87384hjdhjh'
+app.secret_key='kdjklfjkd87384hjdhjh'
 
 # 防止数据库连接超时
 SQLALCHEMY_POOL_SIZE = 20
 SQLALCHEMY_POOL_TIMEOUT = 300
 
-
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET','POST'])
 def register():
     if request.method == "POST":
         # 获取表格
@@ -65,29 +63,30 @@ def register():
             return "The passwords entered twice are inconsistent.", 515
 
 
-@app.route('/register/customer/<customer_id>', methods=['GET', 'POST'])
+@app.route('/register/customer/<customer_id>', methods=['GET','POST'])
 def customer_register(customer_id):
+
     if request.method == "POST":
         address = request.args.get("address")
         if len(address) == 0:
             db.session.remove()
-            return "Please input the address!", 512
+            return "Please input the address!",512
         state = request.args.get("state")
         if len(state) == 0:
             db.session.remove()
-            return "Please input the state", 512
+            return "Please input the state",512
         city = request.args.get("city")
         if len(city) == 0:
             db.session.remove()
-            return "Please input the city", 512
+            return "Please input the city",512
         zip_code = request.args.get("zip_code")
         if zip_code == 0:
             db.session.remove()
-            return "Please input the zip code", 512
+            return "Please input the zip code",512
         kind = request.args.get("kind")
         if len(kind) == 0:
             db.session.remove()
-            return "Please input the kind", 512
+            return "Please input the kind",512
 
         flash("Account created successfully.")
 
@@ -99,7 +98,7 @@ def customer_register(customer_id):
         db.session.execute(insert_statement)
         db.session.commit()
         db.session.remove()
-        return "Account created successfully.", 200
+        return "Account created successfully.",200
 
 
 @app.route('/register/customer/<customer_id>/business', methods=['POST'])
@@ -154,39 +153,39 @@ def salesperson_register(salesperson_id):
         name = request.args.get("name")
         if len(name) == 0:
             db.session.remove()
-            return "Please input the name", 512
+            return "Please input the name",512
         email = request.args.get("email")
         if len(email) == 0:
             db.session.remove()
-            return "Please input the email", 512
+            return "Please input the email",512
         job_title = request.args.get("job_title")
         if len(job_title) == 0:
             db.session.remove()
-            return "Please input the job title", 512
+            return "Please input the job title",512
         store_assigned = request.args.get("store_assigned")
         if store_assigned == 0:
             db.session.remove()
-            return "Please input the store assigned", 512
+            return "Please input the store assigned",512
         salary = request.args.get("salary")
         if salary == 0:
             db.session.remove()
-            return "Please input the salary", 512
+            return "Please input the salary",512
         state = request.args.get("state")
         if len(state) == 0:
             db.session.remove()
-            return "Please input the state", 512
+            return "Please input the state",512
         city = request.args.get("city")
         if len(city) == 0:
             db.session.remove()
-            return "Please input the city", 512
+            return "Please input the city",512
         address = request.args.get("address")
         if len(address) == 0:
             db.session.remove()
-            return "Please input the address", 512
+            return "Please input the address",512
         zip_code = request.args.get("zip_code")
         if zip_code == 0:
             db.session.remove()
-            return "Please input the zip code", 512
+            return "Please input the zip code",512
 
         # 判断store是否已经存在
         query_statement = "SELECT * FROM store WHERE store_id = " + str(store_assigned)
@@ -195,7 +194,7 @@ def salesperson_register(salesperson_id):
         if not store_existed:
             flash("Store doesn't exist")
             db.session.remove()
-            return "Store doesn't exist", 513
+            return "Store doesn't exist",513
 
         # 导入salesperson
         insert_statement = ("INSERT INTO salespersons " +
@@ -208,7 +207,7 @@ def salesperson_register(salesperson_id):
         db.session.commit()
         flash("salesperson create successfully")
         db.session.remove()
-        return "salesperson create successfully", 200
+        return "salesperson create successfully",200
 
 
 @app.route('/register/store', methods=["POST"])
@@ -217,31 +216,31 @@ def store_register():
         store_id = request.args.get("store_id")
         if store_id == 0:
             db.session.remove()
-            return "Please input store id", 512
+            return "Please input store id",512
         address = request.args.get("address")
         if len(address) == 0:
             db.session.remove()
-            return "Please input the address", 512
+            return "Please input the address",512
         state = request.args.get("state")
         if len(state) == 0:
             db.session.remove()
-            return "Please input the state", 512
+            return "Please input the state",512
         city = request.args.get("city")
         if len(city) == 0:
             db.session.remove()
-            return "Please input the city", 512
+            return "Please input the city",512
         manager = request.args.get("manager")
         if len(manager) == 0:
             db.session.remove()
-            return "Please input the manager", 512
+            return "Please input the manager",512
         number_of_salesperson = request.args.get("salesperson")
         if number_of_salesperson == 0:
             db.session.remove()
-            return "Please input the number of salesperson", 512
+            return "Please input the number of salesperson",512
         region = request.args.get("region")
         if region == 0:
             db.session.remove()
-            return "Please input the region", 512
+            return "Please input the region",512
 
         # 判断region是否已经存在
         query_statement = "SELECT * FROM region WHERE region_id = " + str(region)
@@ -250,7 +249,7 @@ def store_register():
         if not region_existed:
             flash("region doesn't exist")
             db.session.remove()
-            return "region doesn't exist", 513
+            return "region doesn't exist",513
 
         # 判断store_id是否重复
         query_statement_2 = "SELECT * FROM store WHERE store_id = " + str(store_id)
@@ -259,7 +258,7 @@ def store_register():
         if store_existed:
             flash("store id existed")
             db.session.remove()
-            return "store id existed", 514
+            return "store id existed",514
 
         # 导入store
         insert_statement = ("INSERT INTO store " +
@@ -271,7 +270,7 @@ def store_register():
         db.session.commit()
         flash("store create successfully")
         db.session.remove()
-        return "store create successfully", 200
+        return "store create successfully",200
 
 
 @app.route('/register/region', methods=["POST"])
@@ -280,15 +279,15 @@ def register_region():
         region_id = request.args.get("region_id")
         if region_id == 0:
             db.session.remove()
-            return "Please input region id", 512
+            return "Please input region id",512
         region_name = request.args.get("region_name")
         if len(region_name) == 0:
             db.session.remove()
-            return "Please input region name", 512
+            return "Please input region name",512
         region_manager = request.args.get("region_manager")
         if len(region_manager) == 0:
             db.session.remove()
-            return "Please input region manager", 512
+            return "Please input region manager",512
 
         # 判断region_id是否重复
         query_statement = "SELECT * FROM region WHERE region_id = " + str(region_id)
@@ -297,7 +296,7 @@ def register_region():
         if region_existed:
             flash("region id existed")
             db.session.remove()
-            return "region id existed", 513
+            return "region id existed",513
 
         # 导入region数据
         insert_statement = ("INSERT INTO region " +
@@ -308,10 +307,10 @@ def register_region():
         db.session.commit()
         flash("region create successfully")
         db.session.remove()
-        return "region create successfully", 200
+        return "region create successfully",200
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET','POST'])
 def login():
     if request.method == "POST":
         # 获取表格
@@ -319,13 +318,13 @@ def login():
         password_input = request.args.get("password")
 
         # 获取数据库中数据
-        query_statement = "SELECT * FROM user WHERE user_id = '" + str(user_id_input) + "'"
+        query_statement = "SELECT * FROM users WHERE user_id = '" + str(user_id_input) + "'"
         user_existed = db.session.execute(query_statement)
 
         if user_existed.rowcount == 0:
             flash("Account doesn't exist")
             db.session.remove()
-            return "Account doesn't exist", 512
+            return "Account doesn't exist",512
         else:
             # 查找密码
             user_get = next(user_existed)
@@ -334,14 +333,14 @@ def login():
             if password_input == password:
                 flash('Account login successfully')
                 db.session.remove()
-                return "Account login successfully", 200
+                return "Account login successfully",200
             else:
                 flash('Password incorrect')
                 db.session.remove()
-                return "Password incorrect", 513
+                return "Password incorrect",513
 
 
-@app.route('/transaction', methods=['POST', 'GET'])
+@app.route('/transaction', methods=['POST','GET'])
 def transaction():
     if request.method == "POST":
         # 获取数据
@@ -394,10 +393,10 @@ def transaction():
         transaction_id = str(transaction_id)
         notice = "transaction created successfully"
         db.session.remove()
-        return jsonify({'notice': notice, 'transaction_id': transaction_id}), 200
+        return jsonify({'notice':notice, 'transaction_id':transaction_id}), 200
 
 
-@app.route('/sub_transaction/<transaction_id>', methods=['POST', 'GET'])
+@app.route('/sub_transaction/<transaction_id>', methods=['POST','GET'])
 def sub_transaction(transaction_id):
     if request.method == "POST":
         # 获取表格
@@ -473,12 +472,10 @@ def sub_transaction(transaction_id):
         return "sub_transaction created correctly", 200
 
 
-@app.route('/product', methods=['POST', 'GET'])
+@app.route('/product', methods=['POST','GET'])
 def product():
     if request.method == "POST":
         # 获取表格
-        Product = initDatabase.Products
-
         # 获取数据
         name = request.args.get("name")
         if len(name) == 0:
@@ -499,17 +496,16 @@ def product():
         # inventory_amount可以为0
 
         # 获取目前在列表中已经存在的product数量
-        count = Product.query.count()
+        query_statement = "SELECT COUNT(*) as total_count FROM products"
+        result = db.session.execute(query_statement)
+        count = next(result).total_count
         product_id = count + 1
 
         # 存入数据
-        product = Product(product_id=product_id,
-                          name=name,
-                          category=category,
-                          price=price,
-                          inventory_amount=inventory_amount)
-        print(product_id, name, category, inventory_amount)
-        db.session.add(product)
+        insert_statement = ("INSERT INTO products " +
+                            "VALUES(" + str(product_id) + ", '" + str(name) + "', '" +
+                            str(category) + "', " + str(price) + ", " + str(inventory_amount) + ")")
+        db.session.execute(insert_statement)
         db.session.commit()
         flash("product create successfully")
         db.session.remove()
@@ -519,7 +515,7 @@ def product():
 # delete function：
 # -----------------------------------------------
 # -----------------------------------------------
-@app.route('/delete/product', methods=['GET', 'POST'])
+@app.route('/delete/product', methods=['GET','POST'])
 def delete_product():
     if request.method == "POST":
         # 获取表格
@@ -547,7 +543,7 @@ def delete_product():
         return "The product is deleted correctly", 200
 
 
-@app.route('/delete/sub_transaction', methods=['GET', 'POST'])
+@app.route('/delete/sub_transaction',methods=['GET','POST'])
 def delete_sub_transaction():
     if request.method == "POST":
         # 获取表
@@ -592,11 +588,11 @@ def query_salesperson():
 
         salesperson_dicts = []
         for temp in all_salesperson:
-            salesperson_dict = {'salesperson_id': temp.salesperson_id, 'name': temp.name,
-                                'email': temp.email, 'job_title': temp.job_title,
-                                'store_assigned': temp.store_assigned, 'salary': temp.salary,
-                                'state': temp.state, 'city': temp.city,
-                                'address': temp.address, 'zip_code': temp.zip_code}
+            salesperson_dict = {'salesperson_id':temp.salesperson_id, 'name':temp.name,
+                                'email':temp.email, 'job_title':temp.job_title,
+                                'store_assigned':temp.store_assigned, 'salary':temp.salary,
+                                'state':temp.state, 'city':temp.city,
+                                'address':temp.address, 'zip_code':temp.zip_code}
             salesperson_dicts.append(salesperson_dict)
 
         return json.dumps(salesperson_dicts), 200
@@ -615,11 +611,11 @@ def query_salesperson_id():
         if result.rowcount == 0:
             return "salesperson doesn't existed", 512
         salesperson_get = next(result)
-        salesperson_dict = {'salesperson_id': salesperson_get.salesperson_id, 'name': salesperson_get.name,
-                            'email': salesperson_get.email, 'job_title': salesperson_get.job_title,
-                            'store_assigned': salesperson_get.store_assigned, 'salary': salesperson_get.salary,
-                            'state': salesperson_get.state, 'city': salesperson_get.city,
-                            'address': salesperson_get.address, 'zip_code': salesperson_get.zip_code}
+        salesperson_dict = {'salesperson_id':salesperson_get.salesperson_id, 'name':salesperson_get.name,
+                            'email':salesperson_get.email, 'job_title':salesperson_get.job_title,
+                            'store_assigned':salesperson_get.store_assigned, 'salary':salesperson_get.salary,
+                            'state':salesperson_get.state, 'city':salesperson_get.city,
+                            'address':salesperson_get.address, 'zip_code':salesperson_get.zip_code}
         return json.dumps(salesperson_dict), 200
 
 
@@ -636,9 +632,9 @@ def query_store_id():
         if result.rowcount == 0:
             return "store doesn't existed", 512
         store_get = next(result)
-        store_dict = {'store_id': store_get.store_id, 'address': store_get.address,
-                      'state': store_get.state, 'city': store_get.city, 'manager': store_get.manager,
-                      'number_of_salesperson': store_get.number_of_salesperson, 'region': store_get.region}
+        store_dict = {'store_id':store_get.store_id, 'address':store_get.address,
+                      'state':store_get.state, 'city':store_get.city, 'manager':store_get.manager,
+                      'number_of_salesperson':store_get.number_of_salesperson, 'region':store_get.region}
         return json.dumps(store_dict), 200
 
 
@@ -654,8 +650,8 @@ def query_region_id():
     if result.rowcount == 0:
         return "region doesn't existed", 512
     region_get = next(result)
-    region_dict = {'region_id': region_get.region_id, 'region_name': region_get.region_name,
-                   'region_manager': region_get.region_manager}
+    region_dict = {'region_id':region_get.region_id, 'region_name':region_get.region_name,
+                   'region_manager':region_get.region_manager}
     return json.dumps(region_dict), 200
 
 
@@ -768,7 +764,7 @@ def query_product():
         for temp in all_product:
             product_dict = {'product_id': temp.product_id, 'name': temp.name,
                             'category': temp.category, 'price': temp.price,
-                            'inventory_amount': temp.inventory_amount, 'avatar': temp.avatar}
+                            'inventory_amount': temp.inventory_amount, 'avatar':temp.avatar}
             product_dicts.append(product_dict)
 
         db.session.remove()
@@ -788,12 +784,12 @@ def query_sub_transaction():
 
         transaction_dicts = []
         for temp in all_transactions:
-            transaction_dict = {'transaction_id': temp.transaction_id, 'date': temp.date,
-                                'salesperson_id': temp.salesperson_id,
-                                'customer_id': temp.customer_id,
-                                'sub_transaction_id': temp.sub_transaction_id,
-                                'product_id': temp.product_id,
-                                'quantity': temp.quantity}
+            transaction_dict = {'transaction_id':temp.transaction_id, 'date':temp.date,
+                                'salesperson_id':temp.salesperson_id,
+                                'customer_id':temp.customer_id,
+                                'sub_transaction_id':temp.sub_transaction_id,
+                                'product_id':temp.product_id,
+                                'quantity':temp.quantity}
             transaction_dicts.append(transaction_dict)
 
         db.session.remove()
@@ -833,7 +829,7 @@ def users_judge():
         user = db.engine.execute(query_statement)
 
         # 如果用户不存在，报错
-        if user.rowcount == 0:
+        if not user:
             db.session.remove()
             return "user doesn't existed!", 512
 
@@ -841,12 +837,12 @@ def users_judge():
         query_statement_2 = "SELECT * FROM customers WHERE customer_id = '" + str(user_id) + "'"
         user_type = db.engine.execute(query_statement_2)
         # 如果不存在，则用户是管理员
-        if user_type.rowcount == 0:
+        if not user_type:
             db.session.remove()
-            return "salesperson", 200
+            return "user is salesperson!", 200
         else:
             db.session.remove()
-            return "customer", 200
+            return "user is customer!", 200
 
 
 @app.teardown_appcontext
