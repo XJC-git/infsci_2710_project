@@ -518,14 +518,14 @@ def product():
 @app.route('/delete/product', methods=['GET','POST'])
 def delete_product():
     if request.method == "POST":
-        # 获取表格
-        Product = initDatabase.Products
         # 获取前端返回的id
         product_id = request.args.get("product_id")
 
         # 查看该product是否存在
-        product_existed = Product.query.get(product_id)
-        if not product_existed:
+        query_statement = "SELECT * FROM products WHERE product_id = " + str(product_id)
+        product_existed = db.session.execute(query_statement)
+
+        if product_existed.rowcount == 0:
             db.session.remove()
             return "The product doesn't exist", 512
 
@@ -547,23 +547,27 @@ def delete_product():
 def delete_sub_transaction():
     if request.method == "POST":
         # 获取表
-        Sub_Transaction = initDatabase.Sub_Transactions
-
         # 向前端获取sub_transaction_id
         sub_transaction_id = request.args.get("sub_transaction_id")
 
         # 判断该订单是否存在
-        sub_transaction_existed = Sub_Transaction.query.get(sub_transaction_id)
-        if not sub_transaction_existed:
+        query_statement = "SELECT * FROM sub_transactions WHERE sub_transaction_id = " + str(sub_transaction_id)
+        existed = db.session.execute(query_statement)
+
+        if existed.rowcount == 0:
             db.session.remove()
             return "the transaction not existed", 513
 
         # 如果存在，开始删除
         # 先判断该子订单是否是最后一个子订单，如果是，则连同主订单一起删除
         # 获取主订单id
-        transaction_id = sub_transaction_existed.transaction_id
+        transaction_id = next(existed).transaction_id
         # 获取计数
-        count = Sub_Transaction.query.filter_by(transaction_id=transaction_id).count()
+        count_statement = ("SELECT COUNT(*) as total_count FROM sub_transactions " +
+                           "WHERE transaction_id = " + str(transaction_id))
+        result = db.session.execute(count_statement)
+        count = next(result).total_count
+
         # 删除子订单
         delete_query = "DELETE FROM sub_transactions WHERE sub_transaction_id = " + str(sub_transaction_id)
         db.session.execute(delete_query)
