@@ -966,7 +966,7 @@ def product_with_transaction_salesperson():
             products_dict = {'product_id': temp.product_id, 'salesperson_id': temp.salesperson_id, 'sales': temp.sales}
             products_dicts.append(products_dict)
 
-        return json.dumps(products_dicts), 200
+        return json.dumps(products_dicts, default=defaultencode), 200
 
 
 @app.route('/salesperson/with_store', methods=['GET'])
