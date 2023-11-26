@@ -1,4 +1,4 @@
-# 后端代码调用前待安装环境
+
 flask==2.3.3
 flask_sqlalchemy==2.5.1
 mysql-connector-python==8.2.0
