@@ -951,7 +951,7 @@ def defaultencode(o):
 def product_with_transaction_salesperson():
     if request.method == "GET":
         query_statement = (
-                    "SELECT sub_transactions.product_id, transactions.salesperson_id, sum(sub_transactions.quantity) AS sales" +
+                    "SELECT sub_transactions.product_id, transactions.salesperson_id, sum(sub_transactions.quantity) AS sales " +
                     "FROM sub_transactions " +
                     "JOIN transactions ON sub_transactions.sub_transaction_id = transactions.transaction_id " +
                     "GROUP BY sub_transactions.product_id, transactions.salesperson_id " +
