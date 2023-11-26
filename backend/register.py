@@ -709,7 +709,7 @@ def query_transaction_customerID():
 
         query_statement = "SELECT * FROM customers WHERE customer_id = '" + str(customer_id) + "'"
         result = db.session.execute(query_statement)
-        if not result.rowcount == 0:
+        if result.rowcount == 0:
             db.session.remove()
             return "customer doesn't existed", 512
 
