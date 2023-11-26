@@ -836,15 +836,7 @@ def users_judge():
             return "user doesn't existed!", 512
 
         # 如果存在，则在customer中查找
-        query_statement_2 = "SELECT * FROM customers WHERE customer_id = '" + str(user_id) + "'"
-        user_type = db.session.execute(query_statement_2)
-        # 如果不存在，则用户是管理员
-        if user_type.rowcount == 0:
-            db.session.remove()
-            return "user is salesperson!", 200
-        else:
-            db.session.remove()
-            return "user is customer!", 200
+        return user.user_type,200
 
 
 @app.route('/search', methods=['POST'])
