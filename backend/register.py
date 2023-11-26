@@ -709,10 +709,10 @@ def query_transaction_customerID():
 
         query_statement = "SELECT * FROM customers WHERE customer_id = '" + str(customer_id) + "'"
         result = db.session.execute(query_statement)
-        customer_exist = next(result)
-        if not customer_exist.rowcount == 0:
+        if not result.rowcount == 0:
             db.session.remove()
             return "customer doesn't existed", 512
+
 
         # 根据customerID 查找订单
         query_statement = ("SELECT * FROM sub_transactions "
