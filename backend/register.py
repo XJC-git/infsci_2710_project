@@ -836,6 +836,8 @@ def users_judge():
             return "user doesn't existed!", 512
 
         # 如果存在，则在customer中查找
+        user = next(user)
+        db.session.remove()
         return user.user_type,200
 
 
