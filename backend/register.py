@@ -753,6 +753,58 @@ def query_transaction_customerID():
         db.session.remove()
         return jsonify(final_result), 200
 
+@app.route('/query/transaction/salespersonID', methods=['POST'])
+def query_transaction_salespersonID():
+    if request.method == "POST":
+        # 获取用户ID
+        salesperson_id = request.args.get("salesperson_id")
+
+        query_statement = "SELECT * FROM salesperson WHERE salesperson_id = '" + str(salesperson_id) + "'"
+        result = db.session.execute(query_statement)
+        if result.rowcount == 0:
+            db.session.remove()
+            return "salesperson doesn't existed", 512
+
+
+        # 根据customerID 查找订单
+        query_statement = ("SELECT * FROM sub_transactions "
+                           "JOIN transactions ON sub_transactions.transaction_id = transactions.transaction_id "
+                           "WHERE transactions.salesperson_id = '" + str(salesperson_id) + "' " +
+                           "ORDER BY sub_transactions.transaction_id DESC")
+        try:
+            all_transactions = db.engine.execute(query_statement)
+        except Exception as e:
+            db.session.remove()
+            return f"false: {str(e)}", 513
+
+        final_result = []
+        for current_transaction in all_transactions:
+            main_transaction_id = current_transaction.transaction_id
+            has_tr = False
+            for tr in final_result:
+                if tr['transaction_id'] == main_transaction_id:
+                    has_tr = True
+                    break
+
+            if not has_tr:
+                temp_dicts = {'transaction_id': main_transaction_id,
+                              'salesperson_id': current_transaction.salesperson_id,
+                              'customer_id': current_transaction.customer_id,
+                              'date': current_transaction.date,
+                              'sub_transactions': []}
+                final_result.append(temp_dicts)
+
+            sub_transaction_dict = {
+                'product_id': current_transaction.product_id,
+                'quantity': current_transaction.quantity}
+
+            for tr in final_result:
+                if tr['transaction_id'] == main_transaction_id:
+                    tr['sub_transactions'].append(sub_transaction_dict)
+
+        db.session.remove()
+        return jsonify(final_result), 200
+
 
 @app.route('/query/product', methods=['GET'])
 def query_product():
