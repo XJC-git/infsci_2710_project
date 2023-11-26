@@ -918,7 +918,7 @@ def product_with_transaction():
         query_statement = ("SELECT product_id, sum(quantity) AS sales " +
                            "FROM sub_transactions " +
                            "GROUP BY product_id " +
-                           "ORDER BY sum(quantity) DESC")
+                           "ORDER BY sum(quantity) DESC LIMIT 10")
         all_products = db.session.execute(query_statement)
         # 判断是否为空
         if all_products.rowcount == 0:
