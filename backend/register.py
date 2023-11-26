@@ -43,7 +43,7 @@ def register():
             return "Please input the password", 513
 
         # 连接数据库版本测试
-        if existed_user:
+        if not existed_user.rowcount == 0:
             flash('User id existed!')
             db.session.remove()
             return "User id existed!", 514
@@ -246,7 +246,7 @@ def store_register():
         query_statement = "SELECT * FROM region WHERE region_id = " + str(region)
         region_existed = db.session.execute(query_statement)
 
-        if not region_existed:
+        if region_existed.rowcount == 0:
             flash("region doesn't exist")
             db.session.remove()
             return "region doesn't exist",513
@@ -293,7 +293,7 @@ def register_region():
         query_statement = "SELECT * FROM region WHERE region_id = " + str(region_id)
         region_existed = db.session.execute(query_statement)
 
-        if region_existed:
+        if not region_existed.rowcount == 0:
             flash("region id existed")
             db.session.remove()
             return "region id existed",513
@@ -368,10 +368,10 @@ def transaction():
         query_statement_2 = "SELECT * FROM salespersons WHERE salesperson_id = '" + str(salesperson_id) + "'"
         salesperson_existed = db.session.execute(query_statement_2)
 
-        if not customer_existed:
+        if customer_existed.rowcount == 0:
             db.session.remove()
             return "The customer doesn't exist", 513
-        if not salesperson_existed:
+        if salesperson_existed.rowcount == 0:
             db.session.remove()
             return "The salesperson doesn't exist", 514
 
@@ -828,23 +828,103 @@ def users_judge():
         user_id = request.args.get("user_id")
         # 根据user_id查找
         query_statement = "SELECT * FROM user WHERE user_id = '" + str(user_id) + "'"
-        user = db.engine.execute(query_statement)
+        user = db.session.execute(query_statement)
 
         # 如果用户不存在，报错
-        if not user:
+        if user.rowcount == 0:
             db.session.remove()
             return "user doesn't existed!", 512
 
         # 如果存在，则在customer中查找
         query_statement_2 = "SELECT * FROM customers WHERE customer_id = '" + str(user_id) + "'"
-        user_type = db.engine.execute(query_statement_2)
+        user_type = db.session.execute(query_statement_2)
         # 如果不存在，则用户是管理员
-        if not user_type:
+        if user_type.rowcount == 0:
             db.session.remove()
             return "user is salesperson!", 200
         else:
             db.session.remove()
             return "user is customer!", 200
+
+
+@app.route('/search', methods=['POST'])
+def search():
+    if request.method == "POST":
+        name = request.args.get("name")
+        if len(name) == 0:
+            return "Please input the content", 512
+
+        search_statement = "SELECT * FROM products WHERE name LIKE '%" + str(name) + "%'"
+        all_search_results = db.session.execute(search_statement)
+
+        search_dicts = []
+        for temp in all_search_results:
+            search_dict = {'product_id':temp.product_id, 'name':temp.name,
+                                'category':temp.category, 'price':temp.price,
+                                'inventory_amount':temp.inventory_amount, 'avatar':temp.avatar}
+            search_dicts.append(search_dict)
+
+        return json.dumps(search_dicts), 200
+
+
+@app.route('/product/with_transaction', methods=['GET'])
+def product_with_transaction():
+    if request.method == "GET":
+        query_statement = ("SELECT product_id, sum(quantity) AS sales" +
+                           "FROM sub_transactions " +
+                           "GROUP BY product_id " +
+                           "ORDER BY sum(quantity) DESC")
+        all_products = db.session.execute(query_statement)
+        # 判断是否为空
+        if all_products.rowcount == 0:
+            return "No products here", 512
+
+        products_dicts = []
+        for temp in all_products:
+            products_dict = {'product_id':temp.product_id, 'sales':temp.sales}
+            products_dicts.append(products_dict)
+
+        return json.dumps(products_dicts), 200
+
+
+@app.route('/product/with_transaction/with_salesperson', methods=['GET'])
+def product_with_transaction_salesperson():
+    if request.method == "GET":
+        query_statement = ("SELECT sub_transactions.product_id, transactions.salesperson_id, sum(sub_transactions.quantity) AS sales" +
+                           "FROM sub_transactions " +
+                           "JOIN transactions ON sub_transactions.sub_transaction_id = transactions.transaction_id " +
+                           "GROUP BY sub_transactions.product_id, transactions.salesperson_id " +
+                           "ORDER BY sum(quantity) DESC, transactions.salesperson_id DESC")
+        all_products = db.session.execute(query_statement)
+        # 判断是否为空
+        if all_products.rowcount == 0:
+            return "No products here", 512
+
+        products_dicts = []
+        for temp in all_products:
+            products_dict = {'product_id':temp.product_id, 'salesperson_id':temp.salesperson_id, 'sales':temp.sales}
+            products_dicts.append(products_dict)
+
+        return json.dumps(products_dicts), 200
+
+
+@app.route('/salesperson/with_store', methods=['GET'])
+def salesperson_with_region():
+    if request.method == "GET":
+        query_statement = ("SELECT salesperson_id, store_assigned " +
+                           "FROM salespersons " +
+                           "ORDER BY store_assigned ASC")
+        all_salesperson = db.session.execute(query_statement)
+        # 判断是否为空
+        if all_salesperson.rowcount == 0:
+            return "No salesperson registered", 512
+        
+        salespersons_dicts = []
+        for temp in all_salesperson:
+            salespersons_dict = {'salesperson_id':temp.salesperson_id, 'store_id':temp.store_assigned}
+            salespersons_dicts.append(salespersons_dict)
+        
+        return json.dumps(salespersons_dicts), 200
 
 
 @app.teardown_appcontext
