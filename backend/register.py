@@ -916,7 +916,7 @@ def search():
 @app.route('/product/with_transaction', methods=['GET'])
 def product_with_transaction():
     if request.method == "GET":
-        query_statement = ("SELECT product_id, sum(quantity) AS sales" +
+        query_statement = ("SELECT product_id, sum(quantity) AS sales " +
                            "FROM sub_transactions " +
                            "GROUP BY product_id " +
                            "ORDER BY sum(quantity) DESC")
