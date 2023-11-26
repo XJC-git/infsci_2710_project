@@ -674,7 +674,7 @@ def query_customer_id():
         temp_customer = next(customer_existed)
         # 判断用户类型
         type_customer = temp_customer.kind
-        if type_customer == "business":
+        if type_customer == "Business":
             # 查找表
             query_statement_2 = "SELECT * FROM business_customers WHERE customer_id = '" + str(customer_id) + "'"
             result = db.session.execute(query_statement_2)
@@ -686,7 +686,7 @@ def query_customer_id():
                                         'business_category': temp_business.business_category,
                                         'company_income': temp_business.company_income}
             return json.dumps(all_customer_information), 200
-        elif type_customer == "home":
+        elif type_customer == "Home":
             # 查找表
             query_statement_2 = "SELECT * FROM home_customers WHERE customer_id = '" + str(customer_id) + "'"
             result = db.session.execute(query_statement_2)
