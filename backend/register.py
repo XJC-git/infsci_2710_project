@@ -191,7 +191,7 @@ def salesperson_register(salesperson_id):
         query_statement = "SELECT * FROM store WHERE store_id = " + str(store_assigned)
         store_existed = db.session.execute(query_statement)
 
-        if not store_existed:
+        if store_existed.rowcount == 0:
             flash("Store doesn't exist")
             db.session.remove()
             return "Store doesn't exist",513
@@ -384,7 +384,7 @@ def transaction():
 
         # 存入数据库
         insert_statement = ("INSERT INTO transactions " +
-                            "VALUES(" + str(transaction_id) + ", '" + str(date) + "', '" +
+                            "VALUES(" + str(transaction_id) + ", '" + str(date_date) + "', '" +
                             str(salesperson_id) + "', '" + str(customer_id) + "')")
 
         db.session.execute(insert_statement)
@@ -704,14 +704,13 @@ def query_customer_id():
 @app.route('/query/transaction/customerID', methods=['POST'])
 def query_transaction_customerID():
     if request.method == "POST":
-        # 获取表格
-        Customer = initDatabase.Customers
-
         # 获取用户ID
         customer_id = request.args.get("customer_id")
 
-        customer_get = Customer.query.get(customer_id)
-        if not customer_get:
+        query_statement = "SELECT * FROM customers WHERE customer_id = '" + str(customer_id) + "'"
+        result = db.session.execute(query_statement)
+        customer_exist = next(result)
+        if not customer_exist.rowcount == 0:
             db.session.remove()
             return "customer doesn't existed", 512
 
@@ -759,9 +758,8 @@ def query_transaction_customerID():
 def query_product():
     if request.method == "GET":
         # 获取表格
-        Product = initDatabase.Products
-
-        all_product = Product.query.all()
+        query_statement = "SELECT * FROM products"
+        all_product = db.session.execute(query_statement)
 
         product_dicts = []
 
