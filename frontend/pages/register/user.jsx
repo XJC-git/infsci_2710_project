@@ -1,9 +1,18 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, Fragment} from "react";
 import axios_instance from "app/axios";
 import {useRouter} from "next/router";
-import { Transition } from '@headlessui/react';
+import {Listbox, Transition} from '@headlessui/react';
 import Notification from "../../components/notification";
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 
+const role = [
+    { id: 1, name: 'Customer', unavailable: false },
+    { id: 2, name: 'Salesperson', unavailable: false },
+]
+const customerType = [
+    { id: 1, name: 'Home', unavailable: false },
+    { id: 2, name: 'Business', unavailable: false },
+]
 export default function User(){
     const router = useRouter();
     const [show,setShow] = useState(false)
@@ -11,6 +20,9 @@ export default function User(){
     const [showNotification,setShowNotification] = useState(false)
     const [typeNotification,setTypeNotification] = useState('success')
     const [contextNotification,setContextNotification] = useState('EMPTY MSG')
+    const [selectedRole, setSelectedRole] = useState(role[0])
+    const [selectedCustomerType, setSelectedCustomerType] = useState(customerType[0])
+
     function handleRegister(){
         const username = document.querySelector("#username").value;
         const password = document.querySelector("#password").value;
@@ -19,7 +31,77 @@ export default function User(){
             params:{
                 user_id:username,
                 password:password,
-                password_1:confirmPassword
+                password_1:confirmPassword,
+                user_type:selectedRole.name
+            }
+        }).then((res) => {
+            if(selectedRole.id===1)handleRegCustomer(username)
+            else{handleRegSalesperson(username)}
+        }).catch((error)=>{
+            if(error.response){
+                setTypeNotification('fail')
+                setContextNotification(error.response.data)
+                setShowNotification(true)
+                setTimeout(function() {
+                    setShowNotification(false)
+                }, 2000);
+            }
+            else{
+                setTypeNotification('fail')
+                setContextNotification(error.message)
+                setShowNotification(true)
+                setTimeout(function() {
+                    setShowNotification(false)
+                }, 2000);
+            }
+
+        });
+    }
+    function handleRegCustomer(customer_id){
+        const address = document.querySelector("#address").value;
+        const state = document.querySelector("#state").value;
+        const city = document.querySelector("#city").value;
+        const zipCode = document.querySelector("#zipCode").value;
+        axios_instance.post('/register/customer/'+customer_id,null,{
+            params:{
+                kind:selectedCustomerType.name,
+                address:address,
+                state:state,
+                city:city,
+                zip_code:zipCode,
+            }
+        }).then((res) => {
+            if(selectedCustomerType.id===1)handleRegCustomerHome(customer_id)
+            else{handleRegCustomerBusiness(customer_id)}
+        }).catch((error)=>{
+            if(error.response){
+                setTypeNotification('fail')
+                setContextNotification(error.response.data)
+                setShowNotification(true)
+                setTimeout(function() {
+                    setShowNotification(false)
+                }, 2000);
+            }
+            else{
+                setTypeNotification('fail')
+                setContextNotification(error.message)
+                setShowNotification(true)
+                setTimeout(function() {
+                    setShowNotification(false)
+                }, 2000);
+            }
+        });
+    }
+
+    function handleRegCustomerHome(customer_id){
+        const marriageStatus = document.querySelector("#marriageStatus").value;
+        const gender = document.querySelector("#gender").value;
+        const age = document.querySelector("#age").value;
+        axios_instance.post('/register/customer/'+customer_id+'/home',null,{
+            params:{
+                gender:gender,
+                marriage_status:marriageStatus,
+                age:age
             }
         }).then((res) => {
             setTypeNotification('success')
@@ -45,7 +127,92 @@ export default function User(){
                     setShowNotification(false)
                 }, 2000);
             }
+        });
+    }
 
+    function handleRegCustomerBusiness(customer_id){
+        const companyName = document.querySelector("#companyName").value;
+        const businessCategory = document.querySelector("#businessCategory").value;
+        const companyIncome = document.querySelector("#companyIncome").value;
+        axios_instance.post('/register/customer/'+customer_id+'/business',null,{
+            params:{
+                company_income:companyIncome,
+                company_name:companyName,
+                business_category:businessCategory
+            }
+        }).then((res) => {
+            setTypeNotification('success')
+            setContextNotification(res.data)
+            setShowNotification(true)
+            setTimeout(function() {
+                setShowNotification(false)
+            }, 2000);
+        }).catch((error)=>{
+            if(error.response){
+                setTypeNotification('fail')
+                setContextNotification(error.response.data)
+                setShowNotification(true)
+                setTimeout(function() {
+                    setShowNotification(false)
+                }, 2000);
+            }
+            else{
+                setTypeNotification('fail')
+                setContextNotification(error.message)
+                setShowNotification(true)
+                setTimeout(function() {
+                    setShowNotification(false)
+                }, 2000);
+            }
+        });
+    }
+
+    function handleRegSalesperson(salesperson_id){
+        const address = document.querySelector("#address").value;
+        const state = document.querySelector("#state").value;
+        const city = document.querySelector("#city").value;
+        const zipCode = document.querySelector("#zipCode").value;
+        const name = document.querySelector("#name").value;
+        const email = document.querySelector("#email").value;
+        const jobTitle = document.querySelector("#jobTitle").value;
+        const storeAssigned = document.querySelector("#storeAssigned").value;
+        const salary = document.querySelector("#salary").value;
+        axios_instance.post('/register/salesperson/'+salesperson_id,null,{
+            params:{
+                address:address,
+                state:state,
+                city:city,
+                zip_code:zipCode,
+                name:name,
+                email:email,
+                job_title:jobTitle,
+                store_assigned:storeAssigned,
+                salary:salary
+            }
+        }).then((res) => {
+            setTypeNotification('success')
+            setContextNotification(res.data)
+            setShowNotification(true)
+            setTimeout(function() {
+                setShowNotification(false)
+            }, 2000);
+        }).catch((error)=>{
+            if(error.response){
+                setTypeNotification('fail')
+                setContextNotification(error.response.data)
+                setShowNotification(true)
+                setTimeout(function() {
+                    setShowNotification(false)
+                }, 2000);
+            }
+            else{
+                setTypeNotification('fail')
+                setContextNotification(error.message)
+                setShowNotification(true)
+                setTimeout(function() {
+                    setShowNotification(false)
+                }, 2000);
+            }
         });
     }
 
@@ -66,9 +233,9 @@ export default function User(){
                     leaveTo="opacity-0"
                     className="flex flex-col items-center justify-center gap-y-4 py-4"
                 >
-                    <div className="flex w-80 flex-col items-center gap-y-2 rounded-lg bg-white py-2 pt-8 shadow">
+                    <div className="flex p-4 flex-col items-center gap-y-2 rounded-lg bg-white py-2 pt-8 shadow">
                         <span className="font-bold text-2xl">Register</span>
-                        <form className="w-64">
+                        <div className="">
                             <div className="">
                                 <span className="px-1 text-sm text-gray-600">Username</span>
                                 <input id="username" placeholder="Enter Username" type="text"
@@ -121,6 +288,335 @@ export default function User(){
 
                             </div>
 
+                            <Listbox value={selectedRole} onChange={setSelectedRole}>
+                                <div className="relative mt-4">
+                                    <Listbox.Button className="relative w-full cursor-default rounded-lg border-2 border-gray-300 focus:border-gray-600
+                        hover:border-gray-400 py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 ">
+                                        <span className="block truncate">{selectedRole.name}</span>
+                                        <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                        <ChevronUpDownIcon
+                                            className="h-5 w-5 text-gray-400"
+                                            aria-hidden="true"
+                                        />
+                                        </span>
+                                    </Listbox.Button>
+                                    <Transition
+                                        as={Fragment}
+                                        leave="transition ease-in duration-100"
+                                        leaveFrom="opacity-100"
+                                        leaveTo="opacity-0"
+                                    >
+                                        <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                                            {role.map((person, personIdx) => (
+                                                <Listbox.Option
+                                                    key={personIdx}
+                                                    className={({ active }) =>
+                                                        `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                                                            active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
+                                                        }`
+                                                    }
+                                                    value={person}
+                                                >
+                                                    {({ selected }) => (
+                                                        <>
+                                                            <span
+                                                                className={`block truncate ${
+                                                                    selected ? 'font-medium' : 'font-normal'
+                                                                }`}
+                                                            >
+                                                                {person.name}
+                                                            </span>
+                                                            {selected ? (
+                                                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
+                                                                    <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                                                                </span>
+                                                            ) : null}
+                                                        </>
+                                                    )}
+                                                </Listbox.Option>
+                                            ))}
+                                        </Listbox.Options>
+                                    </Transition>
+                                </div>
+                            </Listbox>
+
+                            <div className="">
+                                {
+                                    selectedRole.id==1?
+                                        <div className="grid grid-cols-2 gap-x-4 mt-4">
+                                            <div className="">
+                                                <span className="px-1 text-sm text-gray-600">Address</span>
+                                                <input id="address" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
+                                            <div className="">
+                                                <span className="px-1 text-sm text-gray-600">City</span>
+                                                <input id="city" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
+                                            <div className="">
+                                                <span className="px-1 text-sm text-gray-600">State</span>
+                                                <input id="state" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
+                                            <div className="">
+                                                <span className="px-1 text-sm text-gray-600">Zip code</span>
+                                                <input id="zipCode" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
+                                            <Listbox value={selectedCustomerType} onChange={setSelectedCustomerType}>
+                                                <div className="relative col-span-2">
+                                                    <span className="px-1 text-sm text-gray-600">Customer type</span>
+                                                    <Listbox.Button className="relative w-full cursor-default rounded-lg border-2 border-gray-300 focus:border-gray-600
+                        hover:border-gray-400 py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 ">
+                                                        <span className="block truncate">{selectedCustomerType.name}</span>
+                                                        <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                        <ChevronUpDownIcon
+                                            className="h-5 w-5 text-gray-400"
+                                            aria-hidden="true"
+                                        />
+                                        </span>
+                                                    </Listbox.Button>
+                                                    <Transition
+                                                        as={Fragment}
+                                                        leave="transition ease-in duration-100"
+                                                        leaveFrom="opacity-100"
+                                                        leaveTo="opacity-0"
+                                                    >
+                                                        <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                                                            {customerType.map((person, personIdx) => (
+                                                                <Listbox.Option
+                                                                    key={personIdx}
+                                                                    className={({ active }) =>
+                                                                        `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                                                                            active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
+                                                                        }`
+                                                                    }
+                                                                    value={person}
+                                                                >
+                                                                    {({ selected }) => (
+                                                                        <>
+                                                            <span
+                                                                className={`block truncate ${
+                                                                    selected ? 'font-medium' : 'font-normal'
+                                                                }`}
+                                                            >
+                                                                {person.name}
+                                                            </span>
+                                                                            {selected ? (
+                                                                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
+                                                                    <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                                                                </span>
+                                                                            ) : null}
+                                                                        </>
+                                                                    )}
+                                                                </Listbox.Option>
+                                                            ))}
+                                                        </Listbox.Options>
+                                                    </Transition>
+                                                </div>
+                                            </Listbox>
+                                            {selectedCustomerType.id===1?
+                                            <>
+                                                <div className="">
+                                                    <span className="px-1 text-sm text-gray-600">Marriage</span>
+                                                    <input id="marriageStatus" placeholder="0 for false; 1 for true" type="text"
+                                                           className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                    />
+                                                </div>
+                                                <div className="">
+                                                    <span className="px-1 text-sm text-gray-600">Gender</span>
+                                                    <input id="gender" placeholder="" type="text"
+                                                           className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                    />
+                                                </div>
+                                                <div className="col-span-2">
+                                                    <span className="px-1 text-sm text-gray-600">Age</span>
+                                                    <input id="age" placeholder="" type="text"
+                                                           className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                    />
+                                                </div>
+                                            </>:
+                                            <>
+                                                <div className="">
+                                                    <span className="px-1 text-sm text-gray-600">Company name</span>
+                                                    <input id="companyName" placeholder="" type="text"
+                                                           className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                    />
+                                                </div>
+                                                <div className="">
+                                                    <span className="px-1 text-sm text-gray-600">Company income</span>
+                                                    <input id="companyIncome" placeholder="" type="text"
+                                                           className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                    />
+                                                </div>
+                                                <div className="col-span-2">
+                                                    <span className="px-1 text-sm text-gray-600">Business category</span>
+                                                    <input id="businessCategory" placeholder="" type="text"
+                                                           className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                    />
+                                                </div>
+                                            </>}
+                                        </div>
+                                        :
+                                        <div className="grid grid-cols-2 gap-x-4 mt-4">
+                                            <div className="">
+                                                <span className="px-1 text-sm text-gray-600">Address</span>
+                                                <input id="address" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
+                                            <div className="">
+                                                <span className="px-1 text-sm text-gray-600">City</span>
+                                                <input id="city" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
+                                            <div className="">
+                                                <span className="px-1 text-sm text-gray-600">State</span>
+                                                <input id="state" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
+                                            <div className="">
+                                                <span className="px-1 text-sm text-gray-600">Zip code</span>
+                                                <input id="zipCode" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
+                                            <div className="">
+                                                <span className="px-1 text-sm text-gray-600">Real name</span>
+                                                <input id="name" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
+                                            <div className="">
+                                                <span className="px-1 text-sm text-gray-600">Email</span>
+                                                <input id="email" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
+                                            <div className="">
+                                                <span className="px-1 text-sm text-gray-600">Job title</span>
+                                                <input id="jobTitle" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
+                                            <div className="">
+                                                <span className="px-1 text-sm text-gray-600">Salary</span>
+                                                <input id="salary" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
+                                            <div className="col-span-2">
+                                                <span className="px-1 text-sm text-gray-600">Store code</span>
+                                                <input id="storeAssigned" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
+                                        </div>
+                                }
+                            </div>
+
                             <div className="my-6">
                                 <button onClick={handleRegister} type="button" className="text-md text-white block px-3 py-2.5 rounded-lg w-full bg-blue-500 shadow-md
                         hover:bg-blue-600
@@ -128,9 +624,9 @@ export default function User(){
                                     <span>Register</span>
                                 </button>
                             </div>
-                        </form>
+                        </div>
                     </div>
-                    <div className="flex w-80 flex-row justify-between gap-x-4">
+                    <div className="flex w-full flex-row justify-between gap-x-4">
                         <a href="/" className="flex items-center justify-center flex-1 space-x-1 rounded-lg bg-white py-4 text-center text-base font-bold shadow nuxt-link-active text-blue-500 hover:text-blue-700">
                             <svg viewBox="64 64 896 896" data-icon="home" width="1em" height="1em" fill="currentColor" aria-hidden="true" focusable="false" className="">
                                 <path d="M946.5 505L560.1 118.8l-25.9-25.9a31.5 31.5 0 0 0-44.4 0L77.5 505a63.9 63.9 0 0 0-18.8 46c.4 35.2 29.7 63.3 64.9 63.3h42.5V940h691.8V614.3h43.4c17.1 0 33.2-6.7 45.3-18.8a63.6 63.6 0 0 0 18.7-45.3c0-17-6.7-33.1-18.8-45.2zM568 868H456V664h112v204zm217.9-325.7V868H632V640c0-22.1-17.9-40-40-40H432c-22.1 0-40 17.9-40 40v228H238.1V542.3h-96l370-369.7 23.1 23.1L882 542.3h-96.1z">

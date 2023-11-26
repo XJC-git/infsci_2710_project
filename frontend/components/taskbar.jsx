@@ -5,7 +5,7 @@ import {useCart, useUserID} from "./state";
 import useFromStore from "./store";
 import axios_instance from "../app/axios";
 
-const rec = ['iPhone 15','laptop','headphones']
+const rec = ['iPhone','chicken','organic']
 export default function TaskBar(){
     const router = useRouter();
     const path = router.asPath
@@ -30,23 +30,45 @@ export default function TaskBar(){
 
     useEffect(() => {
         if(!userID||userID===0)return
-        axios_instance.post('/query/transaction/customerID',null,{params:{
-                customer_id:userID
-        }}).then((res)=>{
-            setTransaction(res.data)
-            if(res.data.length>0){
-                res.data[0]['sub_transactions'].map((item)=>{
-                    axios_instance.post('/query/productID',null,{params:{
-                            product_id:item['product_id']
-                    }}).then((res) => {
-                        firstTxInfo[item['product_id']] = res.data
-                        setFirstTxInfo(firstTxInfo)
+        if(userType==='Customer'){
+            axios_instance.post('/query/transaction/customerID',null,{params:{
+                    customer_id:userID
+                }}).then((res)=>{
+                setTransaction(res.data)
+                if(res.data.length>0){
+                    res.data[0]['sub_transactions'].map((item)=>{
+                        axios_instance.post('/query/productID',null,{params:{
+                                product_id:item['product_id']
+                            }}).then((res) => {
+                            firstTxInfo[item['product_id']] = res.data
+                            setFirstTxInfo(firstTxInfo)
+                        })
                     })
-                })
 
-            }
+                }
 
-        })
+            })
+        }else{
+            axios_instance.post('/query/transaction/salespersonID',null,{params:{
+                    salesperson_id:userID
+                }}).then((res)=>{
+                setTransaction(res.data)
+                if(res.data.length>0){
+                    res.data[0]['sub_transactions'].map((item)=>{
+                        axios_instance.post('/query/productID',null,{params:{
+                                product_id:item['product_id']
+                            }}).then((res) => {
+                            firstTxInfo[item['product_id']] = res.data
+                            setFirstTxInfo(firstTxInfo)
+                        })
+                    })
+
+                }
+
+            })
+        }
+
+
     }, [userID]);
 
     const handleLoginClick = ()=>{
@@ -64,6 +86,14 @@ export default function TaskBar(){
         }, 200);
     }
 
+    const handleSearch = (e)=>{
+        if (e.key === 'Enter') {
+            const keyword = document.querySelector("#keyword").value;
+            if(keyword.length===0)return
+            setSearchPopup(false)
+            router.push("/search?keyword="+keyword)
+        }
+    }
     return(
         <>
             <nav className="p-6 md:px-10">
@@ -119,6 +149,12 @@ export default function TaskBar(){
                         <a href="/home" className={(path==="/home"?"text-gray-800":"text-gray-400")+" text-xl font-bold hover:text-gray-600"}>
                             Home
                         </a>
+                        {
+                            userType==='Customer'||userType===''?"":
+                                <a href="/dashboard" className={(path==="/dashboard"?"text-gray-800":"text-gray-400")+" text-xl font-bold hover:text-gray-600"}>
+                                    Dashboard
+                                </a>
+                        }
                         <a href="/shoppingCart" className={(path==="/shoppingCart"?"text-gray-800":"text-gray-400")+" flex flex-row gap-2 text-xl font-bold hover:text-gray-600"}>
                             <div className="flex">
                                 ShoppingCart
@@ -127,6 +163,7 @@ export default function TaskBar(){
                                 {total}
                             </div>
                         </a>
+
 
                     </div>
                     <div className="hidden md:flex md:flex-1 md:justify-end gap-x-2">
@@ -171,7 +208,7 @@ export default function TaskBar(){
                 className="absolute z-40 inset-0 min-h-screen w-full h-full bg-gray-800/20 backdrop-blur-sm flex items-center justify-center">
                 <div className="flex w-3/4 flex-col items-center gap-y-2 rounded-lg bg-white pt-4 pb-4 shadow">
                     <div className="flex px-4 items-center w-full">
-                        <input placeholder="Search" className="grow w-full h-8 hover:placeholder-black focus:outline-none"/>
+                        <input onKeyDown={handleSearch} id="keyword" placeholder="Search" className="grow w-full h-8 hover:placeholder-black focus:outline-none"/>
                         <button type="button" className="flex-none inline-flex items-center justify-center text-gray-500 hover:text-gray-700" onClick={()=>setSearchPopup(false)}>
                             <i aria-label="icon: close" className="text-2xl anticon anticon-close">
                                 <svg viewBox="64 64 896 896" data-icon="close" width="1em" height="1em" fill="currentColor" aria-hidden="true" focusable="false" className="">
@@ -226,7 +263,7 @@ export default function TaskBar(){
                         <div className={"flex text-4xl font-bold"}>
                             {userID}
                         </div>
-                        {userType==='customer'?
+                        {userType==='Customer'?
                             <div className={"rounded-xl bg-green-500 text-white text-sm pl-2 pr-2"}>Customer</div>
                             :
                             <div className={"rounded-xl bg-blue-500 text-white text-sm pl-2 pr-2"}>Salesperson</div>

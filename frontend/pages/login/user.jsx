@@ -25,8 +25,8 @@ export default function User(){
                     user_id:username
                 }}
             ).then((res)=>{
-                if(res.data==='customer'){
-                    setUserType('customer')
+                if(res.data==='Customer'){
+                    setUserType('Customer')
                     axios_instance.post('/query/customerID',null,{params:{
                             customer_id:username
                         }}
@@ -34,7 +34,7 @@ export default function User(){
                         setUserInfo(res.data)
                     })
                 }else{
-                    setUserType('salesperson')
+                    setUserType('Salesperson')
                     axios_instance.post('/query/salespersonID',null,{params:{
                             salesperson_id:username
                         }}

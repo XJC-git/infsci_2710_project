@@ -7,13 +7,20 @@ import {useUserID} from "../components/state";
 
 export default function transactions(){
     const userID = useFromStore(useUserID,state => state.userID)
+    const userType = useFromStore(useUserID,state => state.userType)
+
     const [transaction, setTransaction] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [productInfo, setProductInfo] = useState({})
     useEffect(() => {
         if(!userID||userID===0)return
-        axios_instance.post('/query/transaction/customerID',null,{params:{
-                customer_id:userID
+        let url = '/query/transaction/customerID'
+        if(userType!=='Customer'){
+            url = '/query/transaction/salespersonID'
+        }
+        axios_instance.post(url,null,{params:{
+                customer_id:userID,
+                salesperson_id:userID
             }}).then((res)=>{
             setTransaction(res.data)
             let loaded = 0
