@@ -759,7 +759,7 @@ def query_transaction_salespersonID():
         # 获取用户ID
         salesperson_id = request.args.get("salesperson_id")
 
-        query_statement = "SELECT * FROM salesperson WHERE salesperson_id = '" + str(salesperson_id) + "'"
+        query_statement = "SELECT * FROM salespersons WHERE salesperson_id = '" + str(salesperson_id) + "'"
         result = db.session.execute(query_statement)
         if result.rowcount == 0:
             db.session.remove()
