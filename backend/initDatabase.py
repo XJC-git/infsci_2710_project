@@ -30,6 +30,8 @@ class Customers(db.Model):
     city = db.Column(db.String(48))
     zip_code = db.Column(db.Integer)
     kind = db.Column(db.String(12))
+    phone_number = db.Column(db.String(48))
+    email = db.Column(db.String(48))
 
 
 class Region(db.Model):
@@ -39,6 +41,7 @@ class Region(db.Model):
     region_id = db.Column(db.Integer, primary_key=True)
     region_name = db.Column(db.String(48))
     region_manager = db.Column(db.String(48))
+
 
 class Store(db.Model):
     # 定义表名
