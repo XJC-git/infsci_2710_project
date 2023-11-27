@@ -80,13 +80,27 @@ def customer_register(customer_id):
             db.session.remove()
             return "Please input the city", 512
         zip_code = request.args.get("zip_code")
-        if zip_code == 0:
+        if not zip_code:
             db.session.remove()
             return "Please input the zip code", 512
         kind = request.args.get("kind")
         if len(kind) == 0:
             db.session.remove()
             return "Please input the kind", 512
+        phone_number = request.args.get("phone_number")
+        if len(phone_number) == 0:
+            db.session.remove()
+            return "Please input the phone", 512
+        elif len(phone_number) != 10:
+            db.session.remove()
+            return "Phone number format is incorrect", 513
+        email = request.args.get("email")
+        if len(email) == 0:
+            db.session.remove()
+            return "Please input the email", 512
+        elif "@" not in email:
+            db.session.remove()
+            return "Email format is incorrect", 513
 
         flash("Account created successfully.")
 
@@ -94,7 +108,7 @@ def customer_register(customer_id):
         insert_statement = ("INSERT INTO customers " +
                             "VALUES('" + str(customer_id) + "', '" + str(address) + "', '" +
                             str(state) + "', '" + str(city) + "', " + str(zip_code) + ", '" +
-                            str(kind) + "')")
+                            str(kind) + "', '" + str(phone_number) + "', '" + str(email) + "')")
         db.session.execute(insert_statement)
         db.session.commit()
         db.session.remove()
@@ -986,6 +1000,45 @@ def salesperson_with_region():
             salespersons_dicts.append(salespersons_dict)
 
         return json.dumps(salespersons_dicts), 200
+
+
+@app.route('/product/change', methods=['POST'])
+def product_change():
+    if request.method == "POST":
+        # 接收前端信息
+        product_id = request.args.get("product_id")
+        # 三个待修改信息分别是：name, price and inventory amount
+        name = request.args.get("name")
+        price = request.args.get("price")
+        inventory_amount = request.args.get("inventory_amount")
+
+        # 判断三个商品是否同时为空
+        if not name and not price and not inventory_amount:
+            return "Please enter at least one update", 512
+
+        change_value = ""
+        tag = False
+        # 如果name存在
+        if name:
+            change_value += "name = '" + str(name) + "'"
+            tag = True
+
+        # 如果price存在
+        if price:
+            if tag:
+                change_value += ", "
+            change_value += "price = " + str(price)
+
+        # 如果inventory_amount存在
+        if inventory_amount:
+            if tag:
+                change_value += ", "
+            change_value += "inventory_amount = " + str(inventory_amount) + " "
+
+        change_statement = "UPDATE products SET " + change_value + "WHERE product_id = " + str(product_id)
+        db.session.execute(change_statement)
+        db.session.commit()
+        return "product update correctly", 200
 
 
 @app.teardown_appcontext
