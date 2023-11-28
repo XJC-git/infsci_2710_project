@@ -481,6 +481,12 @@ def sub_transaction(transaction_id):
             db.session.commit()
             # 还要再修改原本的product的存量
             sub_transaction_id = sub_transaction_id + 1
+            new_amount = amount - temp_quantity
+            change_statement = ("UPDATE products " + 
+                                "SET inventory_amount = " + str(new_amount) +
+                                " WHERE product_id = " + str(temp_product))
+            db.session.execute(change_statement)
+            db.session.commit()
 
         db.session.remove()
         return "sub_transaction created correctly", 200
