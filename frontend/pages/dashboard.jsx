@@ -295,7 +295,7 @@ export default function dashboard(){
                 </div>
 
             </Transition>
-            <ProductManage id={1} show={managePopup} setShow={setManagePopup}></ProductManage>
+            <ProductManage id={mgID} show={managePopup} setShow={setManagePopup}></ProductManage>
         </>
     )
 }
