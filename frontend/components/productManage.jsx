@@ -60,10 +60,13 @@ const ProductManage = ({id,show,setShow,...props})=>{
         axios_instance.post('/delete/product',null,{params:{
                 product_id:id
             }}).then((res) => {
-            setShow(false)
             setTypeNotification('success')
             setContextNotification(res.data)
             setShowNotification(true)
+            setTimeout(function() {
+                setShowNotification(false)
+                setShow(false)
+            }, 2000);
         }).catch((error)=>{
             if(error.response){
                 setTypeNotification('fail')
