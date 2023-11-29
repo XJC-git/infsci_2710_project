@@ -62,6 +62,8 @@ export default function User(){
         const state = document.querySelector("#state").value;
         const city = document.querySelector("#city").value;
         const zipCode = document.querySelector("#zipCode").value;
+        const phone = document.querySelector("#phone").value;
+        const email = document.querySelector("#email").value;
         axios_instance.post('/register/customer/'+customer_id,null,{
             params:{
                 kind:selectedCustomerType.name,
@@ -69,6 +71,8 @@ export default function User(){
                 state:state,
                 city:city,
                 zip_code:zipCode,
+                phone_number:phone,
+                email:email
             }
         }).then((res) => {
             if(selectedCustomerType.id===1)handleRegCustomerHome(customer_id)
@@ -344,6 +348,28 @@ export default function User(){
                                 {
                                     selectedRole.id==1?
                                         <div className="grid grid-cols-2 gap-x-4 mt-4">
+                                            <div className="">
+                                                <span className="px-1 text-sm text-gray-600">Phone number</span>
+                                                <input id="phone" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
+                                            <div className="">
+                                                <span className="px-1 text-sm text-gray-600">Email</span>
+                                                <input id="email" placeholder="" type="text"
+                                                       className="placeholder-gray-400 text-md block px-3 py-2 rounded-lg w-full bg-white border-2 border-gray-300 shadow-md
+                                                       focus:placeholder-gray-500
+                                                       focus:bg-white
+                                                       focus:border-gray-600
+                                                       focus:outline-none
+                                                       hover:border-gray-400"
+                                                />
+                                            </div>
                                             <div className="">
                                                 <span className="px-1 text-sm text-gray-600">Address</span>
                                                 <input id="address" placeholder="" type="text"
