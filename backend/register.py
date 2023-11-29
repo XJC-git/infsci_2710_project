@@ -514,6 +514,10 @@ def product():
             return "Please input the price", 512
         inventory_amount = request.args.get("inventory_amount")
         # inventory_amount可以为0
+        avatar = request.args.get("avatar")
+        if len(avatar) == 0:
+            db.session.remove()
+            return "Please input the avatar", 512
 
         # 获取目前在列表中已经存在的product数量
         query_statement = "SELECT COUNT(*) as total_count FROM products"
@@ -524,7 +528,8 @@ def product():
         # 存入数据
         insert_statement = ("INSERT INTO products " +
                             "VALUES(" + str(product_id) + ", '" + str(name) + "', '" +
-                            str(category) + "', " + str(price) + ", " + str(inventory_amount) + ")")
+                            str(category) + "', " + str(price) + ", " + str(inventory_amount) +
+                            ", '" + str(avatar) + "')")
         db.session.execute(insert_statement)
         db.session.commit()
         flash("product create successfully")
