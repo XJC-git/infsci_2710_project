@@ -482,7 +482,7 @@ def sub_transaction(transaction_id):
             # 还要再修改原本的product的存量
             sub_transaction_id = sub_transaction_id + 1
             new_amount = amount - temp_quantity
-            change_statement = ("UPDATE products " + 
+            change_statement = ("UPDATE products " +
                                 "SET inventory_amount = " + str(new_amount) +
                                 " WHERE product_id = " + str(temp_product))
             db.session.execute(change_statement)
@@ -704,7 +704,9 @@ def query_customer_id():
                                         'zip_code': temp_customer.zip_code, 'kind': temp_customer.kind,
                                         'company_name': temp_business.company_name,
                                         'business_category': temp_business.business_category,
-                                        'company_income': temp_business.company_income}
+                                        'company_income': temp_business.company_income,
+                                        'phone_number':temp_customer.phone_number,
+                                        'email':temp_customer.email}
             return json.dumps(all_customer_information), 200
         elif type_customer == "Home":
             # 查找表
@@ -715,7 +717,9 @@ def query_customer_id():
                                         'state': temp_customer.state, 'city': temp_customer.city,
                                         'zip_code': temp_customer.zip_code, 'kind': temp_customer.kind,
                                         'marriage_status': temp_home.marriage_status,
-                                        'gender': temp_home.gender, 'age': temp_home.age}
+                                        'gender': temp_home.gender, 'age': temp_home.age,
+                                        'phone_number': temp_customer.phone_number,
+                                        'email': temp_customer.email}
             return json.dumps(all_customer_information), 200
         else:
             return "type is incorrect", 513
