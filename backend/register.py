@@ -554,7 +554,16 @@ def delete_product():
             db.session.remove()
             return "The product doesn't exist", 512
 
-        # 如果存在，删除
+        # 如果存在
+        # 先判定是否被外键关联，即查看product_id是否在transaction中存在
+        query_statement_2 = "SELECT * FROM sub_transactions WHERE product_id = " + str(product_id)
+        foreign_key_existed = db.session.execute(query_statement_2)
+
+        # 如果存在外键关联，返回并报错
+        if not foreign_key_existed.rowcount == 0:
+            db.session.remove()
+            return "There is still transaction related to this product, cannot be deleted.", 513
+
         try:
             delete_statement = "DELETE FROM products WHERE product_id = " + str(product_id)
             db.session.execute(delete_statement)
