@@ -8,6 +8,7 @@ import initDatabase
 import dbInfo
 from datetime import datetime
 import json
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config[
@@ -50,9 +51,11 @@ def register():
             return "User id existed!", 514
         elif password_1 == password:
             flash('Account created successfully.')
+            # 加密密码
+            hashed_password = generate_password_hash(password, method='sha256')
             # 存入数据
             insert_query = ("INSERT INTO user " +
-                            "VALUES('" + str(user_id) + "', '" + str(password) + "', '" +
+                            "VALUES('" + str(user_id) + "', '" + str(hashed_password) + "', '" +
                             str(user_type) + "')")
             db.session.execute(insert_query)
             db.session.commit()
@@ -344,7 +347,7 @@ def login():
             user_get = next(user_existed)
             password = user_get.password
 
-            if password_input == password:
+            if check_password_hash(password, password_input):
                 flash('Account login successfully')
                 db.session.remove()
                 return "Account login successfully", 200
